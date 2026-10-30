@@ -1,33 +1,27 @@
 /* ==========================================================================
    حُجرية بريس (Hujariya Press) — hujariyapress.rawi-ye.com
-   التصميم الصحفي الكلاسيكي العريق المستوحى من هيئة الإذاعة البريطانية (BBC Arabic)
-   بانر أحمر فاتح (#ef3327) حاضن للشعار الأبيض + خلفية نهارية بيضاء مكسورة مريحة للعين
+   التصميم الصحفي الكلاسيكي النظيف المستوحى من BBC News
+   أبيض مكسور نهاري مريح للعين + هيدر أحمر فاتح (#ef3327) نظيف + شريط عاجل تلفزيوني متحرك
    ========================================================================== */
 
 :root {
-  /* الأحمر الفاتح الرسمي المطابق لخلفية شعار حُجرية بريس الأبيض */
   --brand-red: #ef3327;
   --brand-red-dark: #c81e14;
-  --brand-red-soft: rgba(239, 51, 39, 0.08);
+  --breaking-red: #a31616;
 
-  /* درجات الأبيض المكسور النهارية المريحة للعين على غرار الصحف العالمية */
+  /* خلفية نهارية بيضاء مكسورة مريحة للعين */
   --bg-page: #f6f5f2;
-  --bg-surface: #ffffff;
-  --bg-subtle: #eeece6;
+  --bg-card: #ffffff;
+  --bg-subtle: #ebe9e4;
 
-  /* النصوص والخطوط الفاصلة الكلاسيكية (BBC Grid Dividers) */
-  --text-primary: #141414;
-  --text-secondary: #3f3f46;
-  --text-muted: #68686f;
-  --border-color: #d6d3cd;
-  --border-strong: #b8b4ac;
+  /* نصوص واضحة عالية التباين للقراءة السريعة */
+  --text-main: #141414;
+  --text-body: #2c2c30;
+  --text-muted: #66666e;
 
-  /* شارة التوثيق */
+  --border-light: #e0ded8;
+  --border-med: #c8c5bc;
   --verified-blue: #0284c7;
-
-  /* الحواف الكلاسيكية الصارمة (بدون دوائر مبالغ فيها) */
-  --radius-sharp: 2px;
-  --radius-sm: 4px;
 }
 
 *, *::before, *::after {
@@ -45,10 +39,10 @@ html {
 body {
   font-family: 'Cairo', 'Tajawal', sans-serif;
   background-color: var(--bg-page);
-  color: var(--text-primary);
-  line-height: 1.65;
+  color: var(--text-main);
+  line-height: 1.6;
   min-height: 100vh;
-  padding-bottom: 68px;
+  overflow-x: hidden;
 }
 
 img {
@@ -56,243 +50,184 @@ img {
   display: block;
 }
 
-button, input, select, textarea {
+button, input {
   font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 .hidden {
   display: none !important;
 }
 
-/* حاوية الشبكة الإخبارية القياسية لـ BBC */
 .pub-container {
   width: 100%;
-  max-width: 1280px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 14px;
 }
 
-/* تفاعلية واضحة وفورية للأزرار والروابط دون الإخلال بالطابع الكلاسيكي */
-button,
-.btn-interactive,
-.compass-nav-pill,
-.share-pill,
-.app-dock-btn {
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+/* ==================== 1. شريط الطقس العلوي النحيف جداً ==================== */
+.weather-top-strip {
+  background-color: #18181b;
+  color: #e4e4e7;
+  height: 28px;
+  font-size: 0.74rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
 }
 
-button:active,
-.btn-interactive:active,
-.compass-nav-pill:active,
-.share-pill:active {
-  transform: translateY(1px);
+.weather-strip-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* العلامة الحمراء العمودية الشهيرة بجانب عناوين أقسام BBC */
-.bbc-section-mark {
-  display: inline-block;
-  width: 6px;
-  height: 22px;
-  background-color: var(--brand-red);
+.weather-strip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  color: #ffffff;
   flex-shrink: 0;
 }
 
-/* ==================== 1. الشريط المؤسسي العلوي ==================== */
-.top-utility-bar {
-  background-color: #1f1f1f;
-  color: #e4e4e7;
-  font-size: 0.78rem;
-  border-bottom: 1px solid #333333;
+.weather-strip-label .material-symbols-rounded {
+  font-size: 15px;
+  color: #fbbf24;
 }
 
-.utility-inner {
+.weather-ticker-viewport {
+  flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+.weather-ticker-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.weather-ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: #d4d4d8;
+}
+
+.w-sep {
+  opacity: 0.4;
+}
+
+/* ==================== 2. الهيدر الرئيسي النظيف (BBC Clean Red Banner) ==================== */
+.bbc-clean-header {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header-main-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 34px;
   gap: 10px;
-  flex-wrap: wrap;
+  min-height: 44px;
 }
 
-.utility-right, .utility-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.utility-date {
+/* زر القائمة الجانبية */
+.header-menu-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-weight: 700;
-}
-
-.utility-date .material-symbols-rounded {
-  font-size: 16px;
-  color: var(--brand-red);
-}
-
-.utility-sep {
-  color: #52525b;
-}
-
-.utility-tagline {
-  color: #a1a1aa;
-  font-weight: 700;
-}
-
-.utility-link {
-  background: transparent;
-  border: none;
-  color: #e4e4e7;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 2px 6px;
-}
-
-.utility-link:hover {
+  background-color: rgba(0, 0, 0, 0.16);
   color: #ffffff;
-  text-decoration: underline;
-}
-
-.utility-socials {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.utility-socials a {
-  color: #ffffff;
-  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 6px 11px;
+  border-radius: 4px;
+  font-size: 0.84rem;
   font-weight: 800;
-  font-size: 0.74rem;
-  padding: 2px 7px;
-  background: #333333;
-  border-radius: var(--radius-sharp);
+  flex-shrink: 0;
 }
 
-.utility-socials a:hover {
-  background: var(--brand-red);
+.header-menu-btn:hover {
+  background-color: rgba(0, 0, 0, 0.28);
 }
 
-/* ==================== 2. البانر الرئيسي الأحمر الفاتح (BBC Classic Red Header) ==================== */
-.site-header-banner {
-  background-color: var(--brand-red);
-  color: #ffffff;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+.header-menu-btn .material-symbols-rounded {
+  font-size: 21px;
 }
 
-.banner-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.brand-identity-box {
+/* مكان الشعار أو الاسم النصي (نظيف تماماً بدون أي إضافات مزعجة) */
+.header-brand-slot {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   text-decoration: none;
   color: #ffffff;
+  flex-shrink: 0;
 }
 
-/* الشعار الأبيض المفرغ يظهر بوضوح تام على البانر الأحمر الفاتح */
-.site-logo-img {
-  max-height: 60px;
+.header-logo-img {
+  max-height: 44px;
   width: auto;
   object-fit: contain;
 }
 
-.site-text-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand-monogram {
-  width: 46px;
-  height: 46px;
-  background-color: #ffffff;
-  color: var(--brand-red);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.95rem;
-  font-weight: 900;
-  border-radius: var(--radius-sharp);
-}
-
-.brand-titles {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-}
-
-.brand-main-name {
-  font-size: 1.7rem;
+.header-brand-text {
+  font-size: 1.45rem;
   font-weight: 900;
   color: #ffffff;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
 }
 
-.brand-sub-badge {
-  display: inline-block;
-  align-self: flex-start;
-  margin-top: 2px;
-  background-color: rgba(255, 255, 255, 0.22);
-  color: #ffffff;
-  font-size: 0.7rem;
-  font-weight: 900;
-  padding: 1px 6px;
-  letter-spacing: 1px;
-}
-
-.banner-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  max-width: 480px;
-  justify-content: flex-end;
-}
-
-.header-search-box {
+/* حقل البحث المدمج الأنيق */
+.header-search-form {
   position: relative;
-  flex: 1;
   display: flex;
   align-items: center;
+  width: 210px;
+  max-width: 42vw;
 }
 
-.header-search-box input {
+.header-search-form input {
   width: 100%;
-  padding: 8px 36px 8px 32px;
-  border-radius: var(--radius-sharp);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background-color: #ffffff;
-  color: var(--text-primary);
-  font-size: 0.86rem;
+  height: 35px;
+  padding: 4px 30px 4px 26px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.95);
+  color: var(--text-main);
+  font-size: 0.8rem;
   font-weight: 700;
   outline: none;
 }
 
-.header-search-box input::placeholder {
+.header-search-form input::placeholder {
   color: var(--text-muted);
 }
 
-.header-search-box .search-icon {
+.header-search-form .search-icon {
   position: absolute;
-  right: 10px;
+  right: 7px;
+  font-size: 18px;
   color: var(--brand-red);
-  font-size: 20px;
   pointer-events: none;
 }
 
 .clear-search-btn {
   position: absolute;
-  left: 8px;
+  left: 5px;
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -300,95 +235,66 @@ button:active,
   align-items: center;
 }
 
-.banner-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 14px;
-  border-radius: var(--radius-sharp);
-  border: 1px solid #ffffff;
-  background-color: #141414;
-  color: #ffffff;
-  font-size: 0.82rem;
-  font-weight: 800;
-  white-space: nowrap;
+.clear-search-btn .material-symbols-rounded {
+  font-size: 16px;
 }
 
-.banner-action-btn:hover {
-  background-color: #ffffff;
-  color: var(--brand-red);
-}
-
-/* ==================== 3. شريط أقسام BBC الكلاسيكي ذو الفواصل العمودية ==================== */
-.compasses-nav-bar {
-  background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-color);
+/* ==================== 3. شريط الأقسام الكلاسيكي النظيف ==================== */
+.bbc-categories-bar {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
   position: sticky;
   top: 0;
-  z-index: 45;
+  z-index: 40;
 }
 
-.compasses-scroll-list {
+.categories-scroll-row {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   overflow-x: auto;
   scrollbar-width: none;
 }
 
-.compasses-scroll-list::-webkit-scrollbar {
+.categories-scroll-row::-webkit-scrollbar {
   display: none;
 }
 
-.compass-nav-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 11px 16px;
-  background-color: transparent;
+.cat-tab-btn {
+  background: transparent;
   border: none;
-  border-left: 1px solid var(--border-color);
-  border-bottom: 4px solid transparent;
-  color: var(--text-primary);
-  font-size: 0.88rem;
+  border-bottom: 3px solid transparent;
+  padding: 10px 14px;
+  font-size: 0.85rem;
   font-weight: 800;
+  color: var(--text-body);
   white-space: nowrap;
-  border-radius: 0;
+  position: relative;
 }
 
-.compass-nav-pill:first-child {
-  border-right: 1px solid var(--border-color);
+.cat-tab-btn:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 28%;
+  height: 44%;
+  width: 1px;
+  background-color: var(--border-light);
 }
 
-.compass-nav-pill .material-symbols-rounded {
-  font-size: 18px;
-  color: var(--brand-red);
-}
-
-.compass-nav-pill:hover {
-  background-color: var(--bg-subtle);
-  border-bottom-color: var(--border-strong);
-}
-
-.compass-nav-pill.active {
-  background-color: var(--bg-page);
+.cat-tab-btn.active,
+.cat-tab-btn:hover {
   color: var(--brand-red);
   border-bottom-color: var(--brand-red);
 }
 
-.compass-flag-tiny {
-  width: 18px;
-  height: 13px;
-  object-fit: cover;
-  border: 1px solid var(--border-color);
-}
-
+/* شريط الفئات الفرعية */
 .subcategories-bar-wrap {
   background-color: var(--bg-subtle);
-  border-bottom: 1px solid var(--border-color);
-  padding: 7px 0;
+  border-bottom: 1px solid var(--border-light);
+  padding: 6px 0;
 }
 
-.subcategories-scroll-list {
+.subcategories-scroll-row {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -396,426 +302,567 @@ button:active,
   scrollbar-width: none;
 }
 
-.subcat-pill {
-  padding: 4px 12px;
-  border-radius: var(--radius-sharp);
-  border: 1px solid var(--border-strong);
-  background-color: var(--bg-surface);
-  color: var(--text-secondary);
-  font-size: 0.78rem;
+.subcategories-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.subcat-chip {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-med);
+  color: var(--text-body);
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 0.76rem;
   font-weight: 800;
   white-space: nowrap;
 }
 
-.subcat-pill.active,
-.subcat-pill:hover {
+.subcat-chip.active {
   background-color: var(--brand-red);
-  color: #ffffff;
   border-color: var(--brand-red);
-}
-
-/* ==================== 4. شريط الأخبار العاجلة الكلاسيكي ==================== */
-.breaking-news-bar {
-  background-color: #991b1b;
   color: #ffffff;
-  padding: 7px 0;
-  border-bottom: 2px solid #7f1d1d;
 }
 
-.breaking-inner {
+/* ==================== 4. شريط الأخبار العاجلة التلفزيوني المتحرك (TV Ticker) ==================== */
+.tv-breaking-bar {
+  background-color: var(--breaking-red);
+  color: #ffffff;
+  height: 36px;
+  border-bottom: 1px solid #7f1d1d;
+  overflow: hidden;
+}
+
+.tv-breaking-inner {
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.breaking-badge {
+.tv-breaking-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   background-color: #ffffff;
-  color: #991b1b;
-  padding: 2px 10px;
-  border-radius: var(--radius-sharp);
-  font-size: 0.8rem;
+  color: var(--breaking-red);
+  padding: 2px 9px;
+  border-radius: 2px;
+  font-size: 0.76rem;
   font-weight: 900;
   flex-shrink: 0;
+  z-index: 2;
 }
 
 .pulse-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
   background-color: var(--brand-red);
-  display: inline-block;
-  animation: blinkPulse 1s infinite;
+  animation: pulseBlink 1s infinite;
 }
 
-@keyframes blinkPulse {
+@keyframes pulseBlink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
 }
 
-.breaking-ticker-track {
+.tv-ticker-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 18px;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-  flex: 1;
+  direction: rtl;
 }
 
-.breaking-ticker-item {
+/* حركة شريط التلفزيون المستمرة بلا نهاية */
+.tv-ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  white-space: nowrap;
+  will-change: transform;
+  animation: tvTickerMove 28s linear infinite;
+}
+
+.tv-ticker-viewport:hover .tv-ticker-track,
+.tv-ticker-viewport:active .tv-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes tvTickerMove {
+  0% { transform: translateX(-15%); }
+  100% { transform: translateX(100%); }
+}
+
+.tv-ticker-item {
   background: transparent;
   border: none;
   color: #ffffff;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.breaking-ticker-item:hover {
-  text-decoration: underline;
-}
-
-/* ==================== 5. شبكة التغطية الرئيسية الكلاسيكية (BBC Top Story & Live Column) ==================== */
-.main-workspace {
-  margin-top: 20px;
-}
-
-.hero-pulse-grid {
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 20px;
-  margin-bottom: 28px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid var(--border-color);
-}
-
-.hero-card {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-top: 4px solid var(--brand-red);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  cursor: pointer;
-}
-
-.hero-card-media {
-  position: relative;
-  width: 100%;
-  height: 370px;
-  background-color: #1f1f1f;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.hero-card-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero-card-body {
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex: 1;
-}
-
-.hero-badges-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-
-.cat-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: var(--radius-sharp);
-  background-color: var(--brand-red);
-  color: #ffffff;
-  font-size: 0.74rem;
-  font-weight: 800;
-}
-
-.hero-title {
-  font-size: 1.55rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  line-height: 1.38;
-  margin-bottom: 10px;
-}
-
-.hero-card:hover .hero-title {
-  color: var(--brand-red);
-  text-decoration: underline;
-}
-
-.hero-summary {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  margin-bottom: 14px;
-  line-height: 1.65;
-}
-
-.card-meta-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-color);
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-
-.card-author-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-weight: 800;
-  color: var(--text-primary);
 }
 
-.card-author-pill:hover {
-  color: var(--brand-red);
+.tv-ticker-item:hover {
+  text-decoration: underline;
 }
 
-.card-author-pill img {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  object-fit: cover;
+.tv-ticker-sep {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 900;
 }
 
-.verified-badge {
-  color: var(--verified-blue) !important;
-  font-size: 16px !important;
+/* ==================== 5. القائمة الجانبية الشاملة (Master Sidebar Drawer) ==================== */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 120;
 }
 
-/* العمود الجانبي الكلاسيكي لنبض الأخبار السريعة */
-.quick-pulse-panel {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-top: 4px solid #141414;
-  padding: 14px 16px;
+.master-sidebar-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 310px;
+  max-width: 86vw;
+  background-color: var(--bg-card);
+  border-left: 1px solid var(--border-light);
+  z-index: 130;
   display: flex;
   flex-direction: column;
-  max-height: 570px;
+  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.15);
 }
 
-.pulse-panel-header {
+.sidebar-drawer-header {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
 }
 
-.pulse-title-wrap {
+.sidebar-brand-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.sidebar-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.15);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-direct-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.sidebar-direct-link .material-symbols-rounded {
+  color: var(--brand-red);
+}
+
+/* القوائم المتداخلة (شيء داخل شيء) */
+.sidebar-accordion-group {
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--bg-card);
+}
+
+.sidebar-accordion-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background-color: var(--bg-page);
+  border: none;
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.acc-title-wrap {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.pulse-title-wrap h2 {
-  font-size: 1.02rem;
-  font-weight: 900;
+.acc-title-wrap .material-symbols-rounded {
+  color: var(--brand-red);
+  font-size: 20px;
 }
 
-.live-indicator {
-  font-size: 0.72rem;
-  font-weight: 900;
-  padding: 2px 7px;
-  background-color: var(--brand-red);
-  color: #ffffff;
-  border-radius: var(--radius-sharp);
+.acc-arrow {
+  transition: transform 0.2s ease;
 }
 
-.quick-pulse-feed {
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+.sidebar-accordion-toggle.open .acc-arrow {
+  transform: rotate(180deg);
 }
 
-.pulse-item {
-  padding: 10px 4px;
-  border-bottom: 1px solid var(--border-color);
-  text-align: right;
-  cursor: pointer;
+.sidebar-accordion-content {
+  padding: 8px;
+  border-top: 1px solid var(--border-light);
+  background-color: var(--bg-card);
 }
 
-.pulse-item:last-child {
+.sidebar-cat-node {
+  border-bottom: 1px solid var(--border-light);
+  padding: 4px 0;
+}
+
+.sidebar-cat-node:last-child {
   border-bottom: none;
 }
 
-.pulse-item:hover .pulse-item-title {
-  color: var(--brand-red);
-  text-decoration: underline;
-}
-
-.pulse-item-time {
-  display: block;
-  font-size: 0.72rem;
-  color: var(--brand-red);
-  font-weight: 800;
-  margin-bottom: 2px;
-}
-
-.pulse-item-title {
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1.45;
-}
-
-/* ==================== 6. قسم الرأي وكُتّاب حُجرية بريس الكلاسيكي ==================== */
-.writers-strip-section {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-top: 3px solid var(--brand-red);
-  padding: 16px 18px;
-  margin-bottom: 28px;
-}
-
-.section-header-row {
+.sidebar-cat-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
 }
 
-.section-heading-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.sidebar-cat-main-btn {
+  flex: 1;
+  text-align: right;
+  background: transparent;
+  border: none;
+  padding: 6px 8px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--text-body);
 }
 
-.section-heading-title h2 {
-  font-size: 1.18rem;
-  font-weight: 900;
-  color: var(--text-primary);
+.sidebar-cat-main-btn:hover {
+  color: var(--brand-red);
 }
 
-.section-sub-hint {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+.sidebar-sub-toggle {
+  background: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 0.72rem;
   font-weight: 700;
+  color: var(--text-muted);
 }
 
-.posts-count-pill {
+.sidebar-subcats-nested {
+  padding: 4px 14px 6px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-right: 2px solid var(--brand-red);
+  margin-right: 8px;
+  margin-top: 4px;
+}
+
+.sidebar-sub-btn {
+  text-align: right;
+  background: transparent;
+  border: none;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-radius: 3px;
+}
+
+.sidebar-sub-btn:hover {
+  background-color: var(--bg-page);
+  color: var(--brand-red);
+}
+
+.sidebar-socials-section {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+}
+
+.sidebar-section-label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.sidebar-socials-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sidebar-socials-grid a {
+  padding: 5px 10px;
+  border-radius: 3px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  text-decoration: none;
   font-size: 0.78rem;
   font-weight: 800;
-  color: var(--text-secondary);
-  background-color: var(--bg-subtle);
-  padding: 2px 10px;
-  border: 1px solid var(--border-color);
 }
 
-.writers-horizontal-list {
-  display: flex;
-  align-items: stretch;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-}
-
-.writer-pill-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background-color: var(--bg-page);
-  border: 1px solid var(--border-color);
-  border-right: 3px solid var(--brand-red);
-  min-width: 235px;
-  text-align: right;
-  border-radius: var(--radius-sharp);
-}
-
-.writer-pill-card:hover {
-  background-color: #ffffff;
+.sidebar-socials-grid a:hover {
+  background-color: var(--brand-red);
+  color: #ffffff;
   border-color: var(--brand-red);
 }
 
-.writer-pill-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid var(--border-strong);
+.sidebar-drawer-footer {
+  padding: 10px 14px;
+  background-color: var(--bg-page);
+  border-top: 1px solid var(--border-light);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ==================== 6. هندسة البطاقات الإخبارية (BBC News Anatomy) ==================== */
+.main-workspace {
+  padding-top: 16px;
+  padding-bottom: 36px;
+}
+
+.bbc-block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bbc-red-mark {
+  width: 5px;
+  height: 18px;
+  background-color: var(--brand-red);
   flex-shrink: 0;
 }
 
-.writer-pill-name {
-  font-size: 0.9rem;
+.bbc-block-header h2 {
+  font-size: 1.08rem;
   font-weight: 900;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  color: var(--text-main);
 }
 
-.writer-pill-job {
+.feed-count-text {
+  margin-right: auto;
   font-size: 0.75rem;
-  color: var(--text-muted);
   font-weight: 700;
+  color: var(--text-muted);
 }
 
-/* ==================== 7. شبكة الأخبار الكلاسيكية على طراز BBC ==================== */
-.public-posts-grid {
+/* القسم العلوي: الخبر الرئيسي + الموجز السريع */
+.bbc-top-section {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(295px, 1fr));
+  grid-template-columns: 1fr 330px;
   gap: 18px;
+  margin-bottom: 24px;
 }
 
-.news-card {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sharp);
+/* بطاقة الخبر الرئيسي (Hero Card) */
+.lead-story-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
 }
 
-.news-card:hover {
-  border-color: var(--border-strong);
-}
-
-.news-card:hover .news-card-title {
-  color: var(--brand-red);
-  text-decoration: underline;
-}
-
-.news-card-thumb {
-  position: relative;
-  height: 185px;
-  background-color: var(--brand-red);
-  border-bottom: 1px solid var(--border-color);
+.lead-story-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 360px;
+  background-color: #18181b;
   overflow: hidden;
+  position: relative;
 }
 
-.news-card-thumb img {
+.lead-story-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* البطاقة الافتراضية للمنشورات التي لم تُرفق لها صورة */
+.lead-story-body {
+  padding: 14px 16px;
+}
+
+.card-cat-tag {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--brand-red);
+  margin-bottom: 4px;
+}
+
+.lead-story-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.38;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.lead-story-card:hover .lead-story-title {
+  color: var(--brand-red);
+}
+
+.lead-story-summary {
+  font-size: 0.9rem;
+  color: var(--text-body);
+  line-height: 1.55;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-clean-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light);
+}
+
+.card-author-name {
+  font-weight: 800;
+  color: var(--text-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.verified-icon {
+  color: var(--verified-blue) !important;
+  font-size: 15px !important;
+}
+
+/* عمود الموجز السريع */
+.bbc-side-brief {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bbc-brief-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 430px;
+  overflow-y: auto;
+}
+
+.brief-item {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+}
+
+.brief-item:last-child {
+  border-bottom: none;
+}
+
+.brief-item-time {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--brand-red);
+  display: block;
+}
+
+.brief-item-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.42;
+}
+
+.brief-item:hover .brief-item-title {
+  color: var(--brand-red);
+}
+
+/* ==================== 7. شبكة بطاقات الأخبار المرتبة بالمسطرة ==================== */
+.bbc-news-section {
+  margin-bottom: 26px;
+}
+
+.bbc-news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.bbc-news-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.bbc-news-card:hover {
+  border-color: var(--border-med);
+}
+
+.bbc-news-card:hover .bbc-card-title {
+  color: var(--brand-red);
+}
+
+.bbc-card-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: var(--brand-red);
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bbc-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* الصورة الافتراضية النظيفة للمنشورات التي ليس لها صورة */
 .brand-fallback-thumb {
   width: 100%;
   height: 100%;
@@ -825,176 +872,228 @@ button:active,
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 14px;
+  padding: 12px;
   text-align: center;
 }
 
 .brand-fallback-thumb img {
-  max-height: 64px;
+  max-height: 52px;
   width: auto;
   object-fit: contain;
-  margin-bottom: 6px;
-}
-
-.brand-fallback-monogram {
-  font-size: 2.5rem;
-  font-weight: 900;
-  line-height: 1;
 }
 
 .brand-fallback-name {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 900;
-  margin-top: 4px;
 }
 
-.news-card-body {
-  padding: 14px 16px;
+.bbc-card-content {
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   flex: 1;
   justify-content: space-between;
 }
 
-.news-card-title {
-  font-size: 1.05rem;
+.bbc-card-title {
+  font-size: 0.98rem;
   font-weight: 900;
-  color: var(--text-primary);
-  line-height: 1.45;
-  margin: 8px 0;
-}
-
-.news-card-excerpt {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
+  line-height: 1.42;
+  color: var(--text-main);
+  margin: 3px 0 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* ==================== 8. قارئ المقال الكلاسيكي وصفحة الكاتب ==================== */
-.reader-top-bar {
+.bbc-card-excerpt {
+  font-size: 0.82rem;
+  color: var(--text-body);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==================== 8. زاوية الكُتّاب الأنيقة ==================== */
+.bbc-writers-section {
+  margin-bottom: 24px;
+}
+
+.writers-clean-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.writers-clean-row::-webkit-scrollbar {
+  display: none;
+}
+
+.writer-clean-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 14px;
+  padding: 8px 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  min-width: 210px;
+  text-align: right;
 }
 
-.article-reader-card {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-top: 4px solid var(--brand-red);
-  padding: 26px;
-  margin-bottom: 28px;
-}
-
-.reader-title {
-  font-size: 1.8rem;
-  font-weight: 900;
-  line-height: 1.38;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-}
-
-.reader-summary {
-  padding: 12px 16px;
-  background-color: var(--bg-page);
-  border-right: 4px solid var(--brand-red);
-  font-size: 1.02rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  margin-bottom: 18px;
-}
-
-.reader-meta-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 14px;
-  padding: 12px 0;
-  margin-bottom: 20px;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.reader-author-box {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.reader-author-avatar {
-  width: 46px;
-  height: 46px;
+.writer-clean-card img {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid var(--border-strong);
+  flex-shrink: 0;
 }
 
-.reader-author-name-row {
+.writer-clean-name {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.96rem;
+  gap: 4px;
 }
 
-.reader-date {
-  font-size: 0.78rem;
+.writer-clean-role {
+  font-size: 0.72rem;
   color: var(--text-muted);
-  font-weight: 700;
 }
 
-.reader-share-actions {
+/* ==================== 9. صفحة قراءة المقال وزر المشاركة الموحد ==================== */
+.article-top-nav {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.share-pill {
+.btn-back-clean {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 6px 12px;
-  border-radius: var(--radius-sharp);
-  border: 1px solid var(--border-strong);
-  background-color: var(--bg-page);
-  color: var(--text-primary);
-  font-size: 0.8rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-med);
+  color: var(--text-main);
+  font-size: 0.82rem;
   font-weight: 800;
 }
 
-.wa-pill { background-color: #15803d; color: #ffffff; border-color: #15803d; }
-.x-pill { background-color: #141414; color: #ffffff; border-color: #141414; }
-.tg-pill { background-color: #0369a1; color: #ffffff; border-color: #0369a1; }
-
-.reader-media-figure {
-  margin-bottom: 20px;
-  border: 1px solid var(--border-color);
-  background-color: #141414;
+.bbc-article-sheet {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  padding: 20px;
+  margin-bottom: 24px;
 }
 
-.reader-media-figure img {
-  width: 100%;
-  max-height: 500px;
+.article-main-headline {
+  font-size: 1.55rem;
+  font-weight: 900;
+  line-height: 1.38;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+.article-lead-summary {
+  padding: 10px 14px;
+  background-color: var(--bg-page);
+  border-right: 3px solid var(--brand-red);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-body);
+  margin-bottom: 14px;
+}
+
+.article-byline-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 0;
+  margin-bottom: 16px;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.byline-author-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+.byline-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.reader-video-box {
-  margin-bottom: 20px;
+.byline-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.88rem;
+}
+
+.byline-time {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* زر المشاركة الموحد فقط */
+.btn-unified-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--brand-red);
+  background-color: var(--brand-red);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.btn-unified-share:hover {
+  background-color: var(--brand-red-dark);
+}
+
+.btn-unified-share .material-symbols-rounded {
+  font-size: 18px;
+}
+
+.article-main-figure {
+  margin-bottom: 18px;
+  background-color: #18181b;
+  border: 1px solid var(--border-light);
+}
+
+.article-main-figure img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: cover;
+}
+
+.article-video-embed {
   position: relative;
   padding-bottom: 56.25%;
   height: 0;
-  border: 1px solid var(--border-color);
+  margin-bottom: 18px;
 }
 
-.reader-video-box iframe {
+.article-video-embed iframe {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1002,31 +1101,60 @@ button:active,
   border: 0;
 }
 
-.reader-content-body {
-  font-size: 1.1rem;
-  line-height: 1.95;
-  color: var(--text-primary);
+.article-body-prose {
+  font-size: 1.04rem;
+  line-height: 1.88;
+  color: var(--text-main);
 }
 
-.reader-content-body p {
-  margin-bottom: 16px;
+.article-body-prose p {
+  margin-bottom: 14px;
 }
 
-.reader-content-body h2,
-.reader-content-body h3 {
-  margin: 22px 0 10px;
-  padding-right: 10px;
-  border-right: 4px solid var(--brand-red);
-  color: var(--text-primary);
+.article-body-prose h2,
+.article-body-prose h3 {
+  margin: 20px 0 8px;
+  padding-right: 8px;
+  border-right: 3px solid var(--brand-red);
   font-weight: 900;
 }
 
-.reader-content-body blockquote {
-  margin: 18px 0;
-  padding: 14px 18px;
+.article-body-prose blockquote {
+  margin: 14px 0;
+  padding: 12px 14px;
   background-color: var(--bg-page);
-  border-right: 4px solid var(--brand-red);
+  border-right: 3px solid var(--brand-red);
   font-weight: 700;
+}
+
+.article-bottom-share {
+  margin-top: 20px;
+  padding: 12px 14px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.article-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.tag-chip {
+  padding: 3px 9px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  color: var(--text-body);
+  font-size: 0.76rem;
+  font-weight: 800;
 }
 
 .inline-hashtag {
@@ -1035,411 +1163,239 @@ button:active,
   cursor: pointer;
 }
 
-.inline-hashtag:hover {
-  text-decoration: underline;
-}
-
-.reader-tags-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 22px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-color);
-}
-
-.tag-chip {
-  padding: 4px 10px;
-  border-radius: var(--radius-sharp);
-  background-color: var(--bg-page);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.tag-chip:hover {
-  background-color: var(--brand-red);
-  color: #ffffff;
-  border-color: var(--brand-red);
-}
-
-/* بطاقة الكاتب في صفحة أرشيف الكاتب */
-.author-profile-hero {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-top: 4px solid var(--brand-red);
-  padding: 22px;
+/* صفحة الكاتب */
+.author-clean-header {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  padding: 18px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
-.author-hero-avatar {
-  width: 90px;
-  height: 90px;
+.author-clean-avatar {
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--brand-red);
 }
 
-.author-hero-name-row {
+.author-clean-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.author-clean-role {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--brand-red);
+}
+
+.author-clean-bio {
+  font-size: 0.86rem;
+  color: var(--text-body);
+  margin-top: 4px;
+}
+
+/* عناصر مساعدة وإعلانات */
+.active-filter-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-right: 3px solid var(--brand-red);
+  margin-bottom: 14px;
+  font-size: 0.84rem;
+}
+
+.filter-banner-info {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.author-hero-job {
-  display: inline-block;
+.btn-clean-reset {
+  padding: 4px 10px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-med);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.load-more-wrap {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.btn-load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-med);
+  color: var(--text-main);
   font-size: 0.85rem;
   font-weight: 800;
+}
+
+.btn-load-more:hover {
+  border-color: var(--brand-red);
   color: var(--brand-red);
-  margin-bottom: 6px;
 }
 
-.author-hero-bio {
-  font-size: 0.92rem;
-  color: var(--text-secondary);
-  max-width: 740px;
-}
-
-.static-page-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 14px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid var(--border-color);
-}
-
-.static-page-icon {
-  color: var(--brand-red);
-  font-size: 28px;
-}
-
-/* ==================== 9. الإعلانات والأزرار الكلاسيكية ==================== */
 .ad-slot-container {
-  margin: 16px 0 22px;
+  margin-bottom: 18px;
 }
 
 .ad-banner-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 12px 16px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-right: 4px solid var(--brand-red);
+  gap: 12px;
+  padding: 10px 14px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
   text-decoration: none;
-  color: var(--text-primary);
+  color: var(--text-main);
 }
 
 .ad-banner-card img {
-  max-height: 84px;
+  max-height: 70px;
   object-fit: cover;
 }
 
-.btn-primary-red {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 22px;
-  border-radius: var(--radius-sharp);
-  border: 1px solid var(--brand-red);
-  background-color: var(--brand-red);
-  color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 900;
-}
-
-.btn-primary-red:hover {
-  background-color: var(--brand-red-dark);
-}
-
-.btn-outline-light {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: var(--radius-sharp);
-  border: 1px solid var(--border-strong);
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
-  font-size: 0.84rem;
-  font-weight: 800;
-}
-
-.btn-outline-light:hover {
-  border-color: var(--brand-red);
-  color: var(--brand-red);
-}
-
-.sm-btn {
-  padding: 5px 12px;
+/* ==================== 10. التذييل النظيف ==================== */
+.bbc-clean-footer {
+  background-color: #18181b;
+  color: #d4d4d8;
+  border-top: 3px solid var(--brand-red);
+  padding: 24px 0 18px;
+  margin-top: 36px;
   font-size: 0.8rem;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-strong);
-  font-weight: 800;
 }
 
-.active-filter-banner {
+.footer-top-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-right: 4px solid var(--brand-red);
-  color: var(--text-primary);
-  margin-bottom: 18px;
-}
-
-.filter-banner-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.filter-banner-info .material-symbols-rounded {
-  color: var(--brand-red);
-}
-
-.load-more-wrap {
-  text-align: center;
-  margin-top: 24px;
-}
-
-/* ==================== 10. التذييل المؤسسي الكلاسيكي وشريط الجوال ==================== */
-.site-footer {
-  margin-top: 44px;
-  background-color: #1f1f1f;
-  color: #e4e4e7;
-  padding-top: 32px;
-  border-top: 4px solid var(--brand-red);
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
-  gap: 28px;
-  padding-bottom: 26px;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #27272a;
 }
 
 .footer-logo-img {
-  max-height: 46px;
+  max-height: 38px;
   width: auto;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
-.footer-brand-title {
-  font-size: 1.25rem;
-  font-weight: 900;
+.footer-title {
   color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 900;
   display: block;
-  margin-bottom: 8px;
 }
 
 .footer-desc {
-  font-size: 0.85rem;
   color: #a1a1aa;
-  margin-bottom: 14px;
+  max-width: 520px;
+  margin-top: 4px;
 }
 
-.footer-links-col h3 {
-  font-size: 0.96rem;
-  font-weight: 900;
-  color: #ffffff;
-  margin-bottom: 12px;
-  padding-right: 8px;
-  border-right: 3px solid var(--brand-red);
-}
-
-.footer-links-list {
+.footer-quick-links {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.footer-nav-link {
+.footer-link-btn {
   background: transparent;
   border: none;
-  color: #d4d4d8;
-  text-align: right;
-  font-size: 0.85rem;
+  color: #e4e4e7;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
-.footer-nav-link:hover {
+.footer-link-btn:hover {
   color: #ffffff;
   text-decoration: underline;
 }
 
-.footer-bottom {
-  background-color: #141414;
-  padding: 14px 0;
-  font-size: 0.78rem;
-  color: #a1a1aa;
-  border-top: 1px solid #2e2e2e;
-}
-
-.footer-bottom-inner {
+.footer-bottom-row {
+  padding-top: 12px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
-}
-
-.footer-domain-badge {
-  padding: 2px 10px;
-  background-color: #27272a;
-  color: #ffffff;
-  font-weight: 800;
-}
-
-/* شريط التنقل السفلي للهواتف */
-.mobile-app-dock {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background-color: var(--bg-surface);
-  border-top: 2px solid var(--border-color);
-  display: none;
-  align-items: center;
-  justify-content: space-around;
-  z-index: 90;
-}
-
-.app-dock-btn {
-  flex: 1;
-  height: 100%;
-  border: none;
-  border-left: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--text-secondary);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  font-size: 0.72rem;
-  font-weight: 800;
-}
-
-.app-dock-btn:last-child {
-  border-left: none;
-}
-
-.app-dock-btn.active {
-  color: var(--brand-red);
-  background-color: var(--bg-page);
-  border-top: 3px solid var(--brand-red);
-}
-
-.sheet-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  z-index: 150;
-}
-
-.sheet-modal-card {
-  width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  background-color: var(--bg-surface);
-  border-top: 4px solid var(--brand-red);
-  padding: 18px;
-  overflow-y: auto;
-}
-
-.sheet-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 10px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.sheet-close-btn {
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--border-strong);
-  background-color: var(--bg-page);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  gap: 8px;
+  color: #a1a1aa;
+  font-size: 0.74rem;
 }
 
 .pub-toast {
   position: fixed;
-  bottom: 74px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #141414;
+  background-color: #18181b;
   color: #ffffff;
-  border-right: 4px solid var(--brand-red);
-  padding: 10px 18px;
-  font-size: 0.85rem;
+  border-right: 3px solid var(--brand-red);
+  padding: 9px 16px;
+  font-size: 0.82rem;
   font-weight: 800;
   z-index: 200;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
-.skeleton-card {
-  height: 250px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-surface);
+.skeleton-box {
+  height: 220px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  font-weight: 800;
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .hero-skeleton {
-  height: 440px;
+  height: 340px;
 }
 
-@media (max-width: 1024px) {
-  .hero-pulse-grid {
-    grid-template-columns: 1fr;
-  }
-  .footer-grid {
+/* توافق شاشات الجوال والأجهزة اللوحية */
+@media (max-width: 960px) {
+  .bbc-top-section {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 768px) {
-  .mobile-app-dock {
-    display: flex;
+@media (max-width: 640px) {
+  .menu-btn-label {
+    display: none;
   }
-  .hide-sm, .hide-md {
-    display: none !important;
+  .header-brand-text {
+    font-size: 1.22rem;
   }
-  .banner-inner {
-    flex-direction: column;
-    align-items: stretch;
+  .header-logo-img {
+    max-height: 36px;
   }
-  .brand-identity-box {
-    justify-content: center;
+  .header-search-form {
+    width: 148px;
   }
-  .banner-actions {
-    max-width: 100%;
+  .bbc-article-sheet {
+    padding: 14px;
   }
-  .article-reader-card {
-    padding: 16px;
+  .article-main-headline {
+    font-size: 1.28rem;
   }
-  .reader-title {
-    font-size: 1.4rem;
+  .lead-story-title {
+    font-size: 1.15rem;
   }
 }
