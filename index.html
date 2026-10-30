@@ -7,11 +7,11 @@
   <meta name="description" id="page-meta-desc" content="حُجرية بريس — منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.">
   <meta name="theme-color" content="#ef3327" id="page-theme-color">
 
-  <!-- إعدادات تطبيق الويب (إضافة إلى الشاشة الرئيسية) والأيقونات الديناميكية -->
+  <!-- إعدادات تطبيق الويب (الإضافة إلى الشاشة الرئيسية) والأيقونات الديناميكية -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="حُجرية بريس">
-  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23ef3327%22/><text x=%2250%%22 y=%2258%%22 font-size=%2260%22 fill=%22%23ffffff%22 font-family=%22Cairo,sans-serif%22 font-weight=%22900%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>ح</text></svg>">
+  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ef3327%22/><text x=%2250%%22 y=%2258%%22 font-size=%2264%22 fill=%22%23ffffff%22 font-family=%22Cairo,sans-serif%22 font-weight=%22900%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>ح</text></svg>">
   <link rel="apple-touch-icon" id="dynamic-apple-icon" href="">
 
   <!-- وسوم المشاركة على واتساب ومنصات التواصل (Open Graph) -->
@@ -23,19 +23,19 @@
   <meta property="og:url" id="og-meta-url" content="https://hujariyapress.rawi-ye.com">
   <meta name="twitter:card" content="summary_large_image">
 
-  <!-- الخطوط العربية الرسمية ومكتبة الأيقونات Google Material Symbols -->
+  <!-- الخطوط العربية الرسمية الرصينة ومكتبة الأيقونات Google Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0" rel="stylesheet">
 
-  <!-- ملف المظهر النهاري للهوية البصرية (حُجرية بريس) -->
+  <!-- ملف المظهر الكلاسيكي الرصين (BBC Style) لمنصة حُجرية بريس -->
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
   <!-- =====================================================================
-       1. الشريط العلوي المؤسسي (التاريخ + الروابط التعريفية + التواصل)
+       1. الشريط العلوي المؤسسي الكلاسيكي
        ===================================================================== -->
   <div class="top-utility-bar">
     <div class="pub-container utility-inner">
@@ -58,13 +58,13 @@
   </div>
 
   <!-- =====================================================================
-       2. البانر الرئيسي باللون الأحمر الفاتح المخصص للشعار الأبيض المفرغ
+       2. البانر الرسمي الكلاسيكي باللون الأحمر الفاتح الحاضن للشعار الأبيض
        ===================================================================== -->
   <header class="site-header-banner" id="site-header-banner">
     <div class="pub-container banner-inner">
-      <!-- منطقة الهوية والشعار (تبديل ذكي بين الشعار المفرغ والاسم النصي من الإعدادات) -->
+      <!-- منطقة الهوية والشعار (تبديل فوري بين الشعار المفرغ والاسم النصي من الإعدادات) -->
       <a href="#home" id="brand-home-link" class="brand-identity-box" aria-label="العودة إلى الصفحة الرئيسية - حُجرية بريس">
-        <!-- صورة الشعار الأبيض المفرغ (تظهر تلقائياً عند إضافتها من الإعدادات) -->
+        <!-- صورة الشعار الأبيض المفرغ (تُدار وتُرفع من إعدادات البوابة) -->
         <img id="site-logo-img" src="" alt="حُجرية بريس" class="site-logo-img hidden">
 
         <!-- الاسم النصي (يمكن إخفاؤه بضغطة زر من الإعدادات عند تفعيل الشعار) -->
@@ -77,11 +77,11 @@
         </div>
       </a>
 
-      <!-- شريط البحث التفاعلي وأزرار الوصول السريع -->
+      <!-- شريط البحث الكلاسيكي وزر النبض السريع -->
       <div class="banner-actions">
         <form id="public-search-form" class="header-search-box" role="search">
           <span class="material-symbols-rounded search-icon" translate="no">search</span>
-          <input type="search" id="public-search-input" placeholder="ابحث في الأخبار، التحليلات، أو الوسوم..." aria-label="بحث في الموقع">
+          <input type="search" id="public-search-input" placeholder="ابحث في الأخبار والتحليلات..." aria-label="بحث في الموقع">
           <button type="button" id="clear-search-btn" class="clear-search-btn hidden" title="مسح البحث">
             <span class="material-symbols-rounded" translate="no">close</span>
           </button>
@@ -89,14 +89,14 @@
 
         <button type="button" id="open-pulse-drawer-btn" class="banner-action-btn" title="نبض الأخبار السريعة">
           <span class="material-symbols-rounded" translate="no">bolt</span>
-          <span class="hide-md">النبض السريع</span>
+          <span class="hide-md">النبض الإخباري</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- =====================================================================
-       3. شريط الأقسام والبوصلات التخصصية (قابل للتمرير السلس)
+       3. شريط الأقسام والبوصلات الكلاسيكي المستوحى من BBC (فواصل عمودية)
        ===================================================================== -->
   <nav class="compasses-nav-bar" aria-label="أقسام حُجرية بريس">
     <div class="pub-container">
@@ -117,13 +117,12 @@
   </div>
 
   <!-- =====================================================================
-       4. شريط الأخبار العاجلة الموقوت (يظهر فقط عند وجود خبر عاجل نشط)
+       4. شريط الأخبار العاجلة الكلاسيكي (يظهر عند وجود خبر عاجل نشط)
        ===================================================================== -->
   <section id="breaking-news-bar" class="breaking-news-bar hidden" aria-label="أخبار عاجلة">
     <div class="pub-container breaking-inner">
       <div class="breaking-badge">
         <span class="pulse-dot"></span>
-        <span class="material-symbols-rounded" translate="no">campaign</span>
         <strong>عاجل</strong>
       </div>
       <div id="breaking-ticker-items" class="breaking-ticker-track"></div>
@@ -131,7 +130,7 @@
   </section>
 
   <!-- =====================================================================
-       5. مساحة المحتوى الرئيسية (تتبدل تفاعلياً كأنها تطبيق)
+       5. مساحة الصحيفة الكلاسيكية الرئيسية (BBC Editorial Layout)
        ===================================================================== -->
   <main class="pub-container main-workspace">
 
@@ -144,32 +143,32 @@
         <span class="material-symbols-rounded" translate="no">filter_alt</span>
         <strong id="active-filter-title">نتائج العرض</strong>
       </div>
-      <button type="button" id="reset-all-filters-btn" class="btn-Interactive sm-btn">
+      <button type="button" id="reset-all-filters-btn" class="btn-interactive sm-btn">
         <span class="material-symbols-rounded" translate="no">restart_alt</span>
         <span>العودة لعرض كل الأخبار</span>
       </button>
     </div>
 
     <!-- =================================================================
-         (أ) واجهة الصفحة الرئيسية والأقسام (Home & Category Feed View)
+         (أ) واجهة الصفحة الرئيسية والأقسام الكلاسيكية (BBC Front Page)
          ================================================================= -->
     <div id="view-home" class="app-view">
 
-      <!-- شبكة التغطية البارزة (Hero) + عمود نبض الأخبار السريعة -->
+      <!-- شبكة التغطية الرئيسية على نمط BBC: خبر رئيسي + عمود النبض والأكثر قراءة -->
       <section id="hero-and-pulse-section" class="hero-pulse-grid">
-        <!-- البطاقة الرئيسية البارزة (Hero Article) -->
+        <!-- الخبر الرئيسي الأول (BBC Top Story) -->
         <div id="hero-featured-box" class="hero-featured-box">
-          <div class="skeleton-card hero-skeleton">جاري تحميل التغطية البارزة...</div>
+          <div class="skeleton-card hero-skeleton">جاري تحميل التغطية الرئيسية...</div>
         </div>
 
-        <!-- عمود نبض الأخبار السريعة -->
+        <!-- العمود الجانبي الإخباري (نبض الأخبار السريعة والمباشرة) -->
         <aside class="quick-pulse-panel" aria-label="نبض الأخبار السريعة">
           <div class="pulse-panel-header">
             <div class="pulse-title-wrap">
-              <span class="material-symbols-rounded pulse-bolt-icon" translate="no">bolt</span>
+              <span class="bbc-section-mark"></span>
               <h2>نبض الأخبار السريعة</h2>
             </div>
-            <span class="live-indicator">مباشر</span>
+            <span class="live-indicator">تحديث مباشر</span>
           </div>
           <div id="quick-pulse-feed" class="quick-pulse-feed">
             <div class="empty-box">جاري مزامنة النبض الإخباري...</div>
@@ -177,14 +176,14 @@
         </aside>
       </section>
 
-      <!-- شريط كُتّاب وأقلام «حُجرية بريس» -->
+      <!-- قسم الرأي وأقلام كُتّاب «حُجرية بريس» (بطابع أعمدة الرأي الكلاسيكية في الصحف الكبرى) -->
       <section id="writers-strip-section" class="writers-strip-section hidden" aria-label="أقلام وكُتّاب حُجرية بريس">
         <div class="section-header-row">
           <div class="section-heading-title">
-            <span class="material-symbols-rounded" translate="no">ink_pen</span>
-            <h2>أقلام وكُتّاب حُجرية بريس</h2>
+            <span class="bbc-section-mark"></span>
+            <h2>أقلام وآراء حُجرية بريس</h2>
           </div>
-          <span class="section-sub-hint">اضغط على الكاتب لتصفح ملفه ومقالاته</span>
+          <span class="section-sub-hint">اختر الكاتب لتصفح زاويته ومقالاته</span>
         </div>
         <div id="writers-horizontal-list" class="writers-horizontal-list"></div>
       </section>
@@ -192,12 +191,12 @@
       <!-- المساحة الإعلانية الوسطى -->
       <div id="ad-slot-middle" class="ad-slot-container hidden"></div>
 
-      <!-- شبكة الأخبار والتقارير والتحليلات -->
+      <!-- شبكة الأخبار والتقارير والتحليلات الكلاسيكية المفصولة بخطوط الصحيفة -->
       <section class="news-feed-section" aria-label="أحدث الأخبار والتقارير">
         <div class="section-header-row">
           <div class="section-heading-title">
-            <span class="material-symbols-rounded" translate="no">newspaper</span>
-            <h2 id="feed-section-heading">أحدث الأخبار والتقارير</h2>
+            <span class="bbc-section-mark"></span>
+            <h2 id="feed-section-heading">أحدث الأخبار والتقارير والتحليلات</h2>
           </div>
           <span id="feed-posts-counter" class="posts-count-pill"></span>
         </div>
@@ -218,13 +217,13 @@
     </div>
 
     <!-- =================================================================
-         (ب) واجهة قراءة المقال الكامل (Article Reader View)
+         (ب) واجهة قراءة المقال الكامل الكلاسيكية (BBC Article Page)
          ================================================================= -->
     <article id="view-article" class="app-view hidden">
       <div class="reader-top-bar">
         <button type="button" id="back-from-article-btn" class="btn-interactive btn-outline-light">
           <span class="material-symbols-rounded" translate="no">arrow_forward</span>
-          <span>العودة للأخبار</span>
+          <span>العودة إلى الصفحة الرئيسية</span>
         </button>
 
         <div id="article-categories-badges" class="article-badges-group"></div>
@@ -234,7 +233,7 @@
         <h1 id="reader-article-title" class="reader-title"></h1>
         <p id="reader-article-summary" class="reader-summary hidden"></p>
 
-        <!-- بطاقة الكاتب ومعلومات النشر والمشاركة التفاعلية -->
+        <!-- شريط معلومات الكاتب والتاريخ وأزرار المشاركة التفاعلية -->
         <div class="reader-meta-bar">
           <div id="reader-author-box" class="reader-author-box" role="button" tabindex="0" title="عرض ملف الكاتب ومقالاته">
             <img id="reader-author-avatar" src="" alt="" class="reader-author-avatar">
@@ -257,6 +256,7 @@
             </button>
             <button type="button" id="share-tg-btn" class="share-pill tg-pill" title="مشاركة عبر تليجرام">
               <span class="material-symbols-rounded" translate="no">send</span>
+              <span>تليجرام</span>
             </button>
             <button type="button" id="copy-article-link-btn" class="share-pill copy-pill" title="نسخ رابط المقال">
               <span class="material-symbols-rounded" translate="no">content_copy</span>
@@ -271,19 +271,19 @@
         <!-- حاوية فيديو يوتيوب المضمن إن وجد -->
         <div id="reader-video-box" class="reader-video-box hidden"></div>
 
-        <!-- النص الكامل للمقال -->
+        <!-- النص الكامل للمقال بتنسيق صحفي كلاسيكي واضح -->
         <div id="reader-article-content" class="reader-content-body"></div>
 
         <!-- الوسوم والهاشتاجات التفاعلية -->
         <div id="reader-tags-box" class="reader-tags-box hidden"></div>
       </div>
 
-      <!-- مقالات ذات صلة -->
+      <!-- تقارير ومواد ذات صلة -->
       <section class="related-posts-section">
         <div class="section-header-row">
           <div class="section-heading-title">
-            <span class="material-symbols-rounded" translate="no">auto_awesome_mosaic</span>
-            <h2>مواد وتقارير ذات صلة</h2>
+            <span class="bbc-section-mark"></span>
+            <h2>موضوعات وتقارير ذات صلة</h2>
           </div>
         </div>
         <div id="related-posts-grid" class="public-posts-grid"></div>
@@ -291,7 +291,7 @@
     </article>
 
     <!-- =================================================================
-         (ج) واجهة الملف الشخصي للكاتب ومقالاته (Author Profile View)
+         (ج) واجهة الملف الشخصي للكاتب ومقالاته (Author Archive View)
          ================================================================= -->
     <section id="view-author" class="app-view hidden">
       <div class="reader-top-bar">
@@ -314,10 +314,10 @@
         </div>
       </div>
 
-      <div class="section-header-row" style="margin-top: 22px;">
+      <div class="section-header-row" style="margin-top: 24px;">
         <div class="section-heading-title">
-          <span class="material-symbols-rounded" translate="no">article</span>
-          <h2 id="author-articles-heading">مقالات وتقارير الكاتب</h2>
+          <span class="bbc-section-mark"></span>
+          <h2 id="author-articles-heading">أرشيف مقالات وتقارير الكاتب</h2>
         </div>
       </div>
       <div id="author-posts-grid" class="public-posts-grid"></div>
@@ -346,7 +346,7 @@
   </main>
 
   <!-- =====================================================================
-       6. التذييل المؤسسي للموقع (Footer)
+       6. التذييل المؤسسي الكلاسيكي (BBC Institutional Footer)
        ===================================================================== -->
   <footer class="site-footer">
     <div class="pub-container footer-grid">
@@ -385,7 +385,7 @@
   </footer>
 
   <!-- =====================================================================
-       7. شريط التنقل السفلي التفاعلي للهواتف (App-Like Bottom Navigation)
+       7. شريط التنقل السفلي السريع للهواتف
        ===================================================================== -->
   <nav class="mobile-app-dock" aria-label="شريط التنقل السريع">
     <button type="button" class="app-dock-btn active" data-dock-action="home">
@@ -394,7 +394,7 @@
     </button>
 
     <button type="button" class="app-dock-btn" data-dock-action="categories">
-      <span class="material-symbols-rounded" translate="no">grid_view</span>
+      <span class="material-symbols-rounded" translate="no">newspaper</span>
       <span>الأقسام</span>
     </button>
 
@@ -414,7 +414,7 @@
     </button>
   </nav>
 
-  <!-- نافذة النبض السريع والأقسام المنبثقة للجوال -->
+  <!-- نافذة القائمة السريعة المنبثقة للجوال -->
   <div id="mobile-sheet-modal" class="sheet-modal-backdrop hidden">
     <div class="sheet-modal-card">
       <div class="sheet-modal-header">
