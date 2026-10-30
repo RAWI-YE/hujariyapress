@@ -1104,3 +1104,632 @@ function renderAllHomeSections() {
 }
 
 // ------------------- نهاية الجزء الأول من محرك الموقع العام النظيف (حُجرية بريس) -------------------
+/* ==========================================================================
+   حُجرية بريس (Hujariya Press) — hujariyapress.rawi-ye.com
+   المحرك البرمجي الكلاسيكي النظيف للموقع العام (BBC Clean Engine)
+   الجزء الثاني والأخير: عداد المشاهدات الفعلي، قارئ الخبر، زر المشاركة الموحد الذكي،
+   القائمة الجانبية المتداخلة (شيء داخل شيء)، والمزامنة اللحظية
+   ========================================================================== */
+
+// ==================== 10. عداد المشاهدات الفعلي والدقيق لكل منشور على حدة ====================
+async function recordUniquePostView(postId) {
+  if (!postId) return;
+  try {
+    const now = Date.now();
+    const rawMap = localStorage.getItem(VIEWED_POSTS_STORAGE_KEY);
+    const viewedMap = rawMap ? JSON.parse(rawMap) : {};
+    const lastViewTime = Number(viewedMap[postId] || 0);
+
+    // عدم احتساب التحديثات العشوائية المتكررة لنفس الزائر خلال 12 ساعة لضمان دقة الإحصائيات
+    if (lastViewTime && now - lastViewTime < 12 * 3600 * 1000) {
+      return;
+    }
+
+    viewedMap[postId] = now;
+    localStorage.setItem(VIEWED_POSTS_STORAGE_KEY, JSON.stringify(viewedMap));
+
+    await updateDoc(doc(db, "posts", postId), {
+      views: increment(1)
+    });
+  } catch (err) {
+    console.warn("View count sync notice:", err);
+  }
+}
+
+// ==================== 11. زر المشاركة الموحد الذكي (العنوان + الملخص + الرابط + الصورة) ====================
+async function shareArticleUnified(post) {
+  if (!post) return;
+
+  const siteName =
+    state.settings.siteName &&
+    state.settings.siteName !== "شبكة البوصلة" &&
+    state.settings.siteName !== "نبض اليمن"
+      ? state.settings.siteName
+      : "حُجرية بريس";
+
+  const shareUrl = `${SITE_CANONICAL_URL}/?post=${encodeURIComponent(post.id)}`;
+  const summaryText =
+    post.summary && String(post.summary).trim() !== ""
+      ? String(post.summary).trim()
+      : stripHtmlToPlain(post.content).slice(0, 165) + "...";
+
+  const formattedShareBody = `📰 ${post.title}\n\n${summaryText}\n\n📌 باقي التفاصيل في موقع ${siteName}:`;
+  const fullClipboardText = `${formattedShareBody}\n${shareUrl}`;
+
+  // محاولة استخدام نافذة المشاركة الأصلية للجوال والنظام (مع إرفاق صورة المقال إن أمكن)
+  if (navigator.share) {
+    try {
+      const shareData = {
+        title: `${post.title} | ${siteName}`,
+        text: formattedShareBody,
+        url: shareUrl
+      };
+
+      await navigator.share(shareData);
+      return;
+    } catch (err) {
+      if (err && err.name === "AbortError") return;
+    }
+  }
+
+  // البديل الفوري للمتصفحات المكتبية: نسخ النص الكامل (العنوان + الملخص + الجملة + الرابط)
+  try {
+    await navigator.clipboard.writeText(fullClipboardText);
+    const labelEl = document.getElementById("unified-share-label");
+    if (labelEl) {
+      labelEl.textContent = "تم نسخ الخبر والموجز والرابط ✓";
+      setTimeout(() => {
+        labelEl.textContent = "مشاركة الخبر";
+      }, 2400);
+    }
+    showPubToast("تم نسخ الخبر مع الملخص والرابط لمشاركته فوراً");
+  } catch (_) {
+    showPubToast("رابط الخبر جاهز للمشاركة");
+  }
+}
+
+// ==================== 12. قارئ الخبر الكامل، الفيديو، والهاشتاجات التفاعلية ====================
+function extractYoutubeEmbedUrl(url = "") {
+  const clean = String(url || "").trim();
+  if (!clean) return "";
+  const regExp =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+  const match = clean.match(regExp);
+  return match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : "";
+}
+
+function formatHashtagsInHtml(htmlContent = "") {
+  if (!htmlContent) return "";
+  return htmlContent.replace(
+    /(^|\s)#([\u0600-\u06FFa-zA-Z0-9_]+)/g,
+    (full, space, tag) => {
+      return `${space}<span class="inline-hashtag" data-inline-tag="${escapeHtml(
+        tag
+      )}">#${escapeHtml(tag)}</span>`;
+    }
+  );
+}
+
+function switchPublicView(viewName) {
+  state.activeView = viewName;
+
+  const views = {
+    home: document.getElementById("view-home"),
+    article: document.getElementById("view-article"),
+    author: document.getElementById("view-author"),
+    static: document.getElementById("view-static-page")
+  };
+
+  Object.entries(views).forEach(([key, el]) => {
+    if (el) el.classList.toggle("hidden", key !== viewName);
+  });
+}
+
+function openArticleReader(postId, updateHistory = true) {
+  const post = getPublishedPosts().find((p) => p.id === postId);
+  if (!post) {
+    showPubToast("الخبر المطلوب غير متوفر حالياً");
+    return;
+  }
+
+  state.currentArticleId = post.id;
+  switchPublicView("article");
+
+  // تسجيل مشاهدة حقيقية ودقيقة لهذا المنشور
+  recordUniquePostView(post.id);
+
+  const compasses = getPostCompasses(post);
+  const authorInfo = resolvePostAuthorInfo(post);
+  const siteName =
+    state.settings.siteName &&
+    state.settings.siteName !== "شبكة البوصلة" &&
+    state.settings.siteName !== "نبض اليمن"
+      ? state.settings.siteName
+      : "حُجرية بريس";
+
+  const shareUrl = `${SITE_CANONICAL_URL}/?post=${encodeURIComponent(post.id)}`;
+  const effectiveImage = getPostEffectiveImageUrl(post);
+  const summaryMeta =
+    post.summary || stripHtmlToPlain(post.content).slice(0, 160);
+
+  // تحديث وسوم المشاركة (OG Tags) لتظهر صورة المقال وعنوانه وموجزه تلقائياً عند المشاركة
+  updateMetaAndOgTags(
+    `${post.title} | ${siteName}`,
+    `${summaryMeta} — باقي التفاصيل في موقع ${siteName}`,
+    effectiveImage,
+    shareUrl
+  );
+
+  if (updateHistory) {
+    try {
+      window.history.pushState(
+        { post: post.id },
+        "",
+        `?post=${encodeURIComponent(post.id)}`
+      );
+    } catch (_) {}
+  }
+
+  // شارات القسم أعلى المقال
+  const badgesEl = document.getElementById("article-categories-badges");
+  if (badgesEl) {
+    badgesEl.innerHTML = [
+      ...compasses.map(
+        (c) =>
+          `<button type="button" class="subcat-chip active" data-reader-compass="${escapeHtml(
+            c
+          )}">${escapeHtml(getCleanCategoryLabel(c))}</button>`
+      ),
+      post.subcategory
+        ? `<span class="subcat-chip">${escapeHtml(post.subcategory)}</span>`
+        : ""
+    ].join(" ");
+
+    badgesEl.querySelectorAll("[data-reader-compass]").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        selectCompassCategory(btn.getAttribute("data-reader-compass"))
+      );
+    });
+  }
+
+  // العنوان والموجز
+  const titleEl = document.getElementById("reader-article-title");
+  if (titleEl) titleEl.textContent = post.title || "";
+
+  const summaryEl = document.getElementById("reader-article-summary");
+  if (summaryEl) {
+    summaryEl.textContent = post.summary || "";
+    summaryEl.classList.toggle("hidden", !post.summary);
+  }
+
+  // بيانات الكاتب والوقت
+  const authorAvatarEl = document.getElementById("reader-author-avatar");
+  if (authorAvatarEl) authorAvatarEl.src = authorInfo.avatar;
+
+  const authorNameEl = document.getElementById("reader-author-name");
+  if (authorNameEl) authorNameEl.textContent = authorInfo.name;
+
+  const authorVerEl = document.getElementById("reader-author-verified");
+  if (authorVerEl) authorVerEl.classList.toggle("hidden", !authorInfo.verified);
+
+  const dateEl = document.getElementById("reader-publish-date");
+  if (dateEl) dateEl.textContent = formatArabicDate(post.createdAt);
+
+  const authorBox = document.getElementById("reader-author-box");
+  if (authorBox) {
+    authorBox.onclick = () => openAuthorProfile(authorInfo.authorKey);
+  }
+
+  // ربط زر المشاركة الموحد (العلوي والسفلي)
+  const shareTopBtn = document.getElementById("unified-share-btn");
+  if (shareTopBtn) {
+    shareTopBtn.onclick = () => shareArticleUnified(post);
+  }
+
+  const shareBottomBtn = document.getElementById("unified-share-bottom-btn");
+  if (shareBottomBtn) {
+    shareBottomBtn.onclick = () => shareArticleUnified(post);
+  }
+
+  // صورة المقال البارزة (أو الصورة الافتراضية للهوية)
+  const mediaFig = document.getElementById("reader-media-figure");
+  if (mediaFig) {
+    mediaFig.innerHTML = buildPostThumbnailHtml(post, post.title);
+  }
+
+  // فيديو يوتيوب المضمن إن وجد
+  const videoBox = document.getElementById("reader-video-box");
+  const embedUrl = extractYoutubeEmbedUrl(post.videoUrl);
+  if (videoBox) {
+    if (embedUrl) {
+      videoBox.innerHTML = `<iframe src="${escapeHtml(
+        embedUrl
+      )}" title="${escapeHtml(
+        post.title
+      )}" allowfullscreen loading="lazy"></iframe>`;
+      videoBox.classList.remove("hidden");
+    } else {
+      videoBox.innerHTML = "";
+      videoBox.classList.add("hidden");
+    }
+  }
+
+  // نص المقال الكامل
+  const contentEl = document.getElementById("reader-article-content");
+  if (contentEl) {
+    contentEl.innerHTML = formatHashtagsInHtml(post.content || "");
+    contentEl.querySelectorAll("[data-inline-tag]").forEach((tagSpan) => {
+      tagSpan.addEventListener("click", () => {
+        filterByHashtag(tagSpan.getAttribute("data-inline-tag"));
+      });
+    });
+  }
+
+  // الوسوم
+  const tagsBox = document.getElementById("reader-tags-box");
+  const tags = Array.isArray(post.tags) ? post.tags.filter(Boolean) : [];
+  if (tagsBox) {
+    if (tags.length) {
+      tagsBox.classList.remove("hidden");
+      tagsBox.innerHTML = tags
+        .map(
+          (t) =>
+            `<button type="button" class="tag-chip" data-tag-chip="${escapeHtml(
+              t
+            )}">#${escapeHtml(t)}</button>`
+        )
+        .join("");
+
+      tagsBox.querySelectorAll("[data-tag-chip]").forEach((chip) => {
+        chip.addEventListener("click", () =>
+          filterByHashtag(chip.getAttribute("data-tag-chip"))
+        );
+      });
+    } else {
+      tagsBox.classList.add("hidden");
+    }
+  }
+
+  // أخبار وتقارير ذات صلة
+  const relatedGrid = document.getElementById("related-posts-grid");
+  if (relatedGrid) {
+    const related = getPublishedPosts()
+      .filter(
+        (p) =>
+          p.id !== post.id &&
+          getPostCompasses(p).some((c) => compasses.includes(c))
+      )
+      .slice(0, 3);
+
+    relatedGrid.innerHTML = related.length
+      ? related.map((r) => buildNewsCardHtml(r)).join("")
+      : `<div class="skeleton-box" style="grid-column:1/-1;height:110px;">لا توجد أخبار أخرى مرتبطة في هذا القسم حالياً.</div>`;
+    bindPostCardsEvents(relatedGrid);
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function filterByHashtag(tag) {
+  if (!tag) return;
+  state.activeTag = tag.replace(/^#/, "").trim();
+  state.activeCompass = "all";
+  state.activeSubcategory = "all";
+  switchPublicView("home");
+  renderCompassesNavigation();
+  renderAllHomeSections();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ==================== 13. صفحة الكاتب وأرشيف مقالاته ====================
+function openAuthorProfile(authorKey, updateHistory = true) {
+  if (!authorKey) return;
+  state.currentAuthorKey = authorKey;
+  switchPublicView("author");
+
+  const keyLower = String(authorKey).trim().toLowerCase();
+
+  const staffMember = state.staff.find(
+    (s) =>
+      String(s.id || "").toLowerCase() === keyLower ||
+      String(s.username || "").toLowerCase() === keyLower ||
+      String(s.email || "").toLowerCase() === keyLower ||
+      String(s.name || "").trim().toLowerCase() === keyLower
+  );
+
+  const authorPosts = getPublishedPosts().filter((p) => {
+    const info = resolvePostAuthorInfo(p);
+    return (
+      String(info.authorKey || "").toLowerCase() === keyLower ||
+      String(info.name || "").trim().toLowerCase() === keyLower ||
+      (staffMember &&
+        String(info.name || "").trim() === String(staffMember.name || "").trim())
+    );
+  });
+
+  const displayName = staffMember?.name || authorPosts[0]?.author || authorKey;
+  const displayAvatar =
+    staffMember?.avatar ||
+    authorPosts[0]?.authorAvatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      displayName
+    )}&background=ef3327&color=fff`;
+  const isVerified = staffMember
+    ? Boolean(
+        staffMember.verified ||
+          staffMember.role === "admin" ||
+          staffMember.isMasterAdmin
+      )
+    : Boolean(authorPosts[0]?.authorVerified);
+  const jobTitle = staffMember?.jobTitle || "كاتب وصحفي في حُجرية بريس";
+  const bio =
+    staffMember?.bio ||
+    `أرشيف المقالات والتقارير المنشورة للكاتب ${displayName} في منصة حُجرية بريس.`;
+
+  if (updateHistory) {
+    try {
+      window.history.pushState(
+        { author: authorKey },
+        "",
+        `?author=${encodeURIComponent(authorKey)}`
+      );
+    } catch (_) {}
+  }
+
+  const avEl = document.getElementById("author-view-avatar");
+  if (avEl) avEl.src = displayAvatar;
+
+  const nameEl = document.getElementById("author-view-name");
+  if (nameEl) nameEl.textContent = displayName;
+
+  const verEl = document.getElementById("author-view-verified");
+  if (verEl) verEl.classList.toggle("hidden", !isVerified);
+
+  const jobEl = document.getElementById("author-view-job");
+  if (jobEl) jobEl.textContent = jobTitle;
+
+  const bioEl = document.getElementById("author-view-bio");
+  if (bioEl) bioEl.textContent = bio;
+
+  const headingEl = document.getElementById("author-articles-heading");
+  if (headingEl) {
+    headingEl.textContent = `مقالات الكاتب: ${displayName} (${authorPosts.length.toLocaleString(
+      "ar-YE"
+    )})`;
+  }
+
+  const gridEl = document.getElementById("author-posts-grid");
+  if (gridEl) {
+    gridEl.innerHTML = authorPosts.length
+      ? authorPosts.map((p) => buildNewsCardHtml(p)).join("")
+      : `<div class="skeleton-box" style="grid-column:1/-1;height:120px;">لا توجد مقالات منشورة لهذا الكاتب حالياً.</div>`;
+    bindPostCardsEvents(gridEl);
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ==================== 14. الصفحات المؤسسية الثابتة (من نحن، الميثاق، الخصوصية) ====================
+function openStaticPage(pageKey) {
+  closeMasterSidebar();
+  switchPublicView("static");
+
+  const titleEl = document.getElementById("static-page-title");
+  const bodyEl = document.getElementById("static-page-body");
+  const s = state.settings;
+
+  if (pageKey === "charter") {
+    if (titleEl) titleEl.textContent = "ميثاق الشرف الصحفي والسياسة التحريرية";
+    if (bodyEl) bodyEl.innerHTML = s.charterHtml || DEFAULT_CHARTER_HTML;
+  } else if (pageKey === "privacy") {
+    if (titleEl) titleEl.textContent = "سياسة الخصوصية وحماية البيانات";
+    if (bodyEl) bodyEl.innerHTML = s.privacyHtml || DEFAULT_PRIVACY_HTML;
+  } else {
+    if (titleEl) titleEl.textContent = "من نحن والتوجيه الوطني";
+    if (bodyEl) bodyEl.innerHTML = s.aboutHtml || DEFAULT_ABOUT_HTML;
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ==================== 15. ربط الأحداث، القائمة الجانبية، والبحث ====================
+function resetToHomeFeed() {
+  closeMasterSidebar();
+  state.activeCompass = "all";
+  state.activeSubcategory = "all";
+  state.activeTag = "";
+  state.searchQuery = "";
+  state.visiblePostsLimit = 12;
+
+  const searchInput = document.getElementById("public-search-input");
+  if (searchInput) searchInput.value = "";
+  document.getElementById("clear-search-btn")?.classList.add("hidden");
+
+  try {
+    window.history.pushState({}, "", window.location.pathname);
+  } catch (_) {}
+
+  switchPublicView("home");
+  applyDynamicSiteIdentity();
+  renderCompassesNavigation();
+  renderAllHomeSections();
+}
+
+function bindPublicEvents() {
+  // القائمة الجانبية الشاملة
+  document
+    .getElementById("open-master-sidebar-btn")
+    ?.addEventListener("click", openMasterSidebar);
+  document
+    .getElementById("close-master-sidebar-btn")
+    ?.addEventListener("click", closeMasterSidebar);
+  document
+    .getElementById("master-sidebar-backdrop")
+    ?.addEventListener("click", closeMasterSidebar);
+  document
+    .getElementById("sidebar-home-btn")
+    ?.addEventListener("click", resetToHomeFeed);
+
+  // القوائم المتداخلة داخل القائمة الجانبية (شيء داخل شيء)
+  document.querySelectorAll(".sidebar-accordion-toggle").forEach((toggleBtn) => {
+    toggleBtn.addEventListener("click", () => {
+      const targetId = toggleBtn.getAttribute("data-acc-target");
+      const contentBox = document.getElementById(targetId);
+      if (!contentBox) return;
+      const isHidden = contentBox.classList.contains("hidden");
+      contentBox.classList.toggle("hidden", !isHidden);
+      toggleBtn.classList.toggle("open", isHidden);
+    });
+  });
+
+  // العودة للرئيسية
+  document.getElementById("brand-home-link")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    resetToHomeFeed();
+  });
+
+  document.getElementById("back-from-article-btn")?.addEventListener("click", () => {
+    try {
+      window.history.pushState({}, "", window.location.pathname);
+    } catch (_) {}
+    switchPublicView("home");
+  });
+
+  document.getElementById("back-from-author-btn")?.addEventListener("click", () => {
+    try {
+      window.history.pushState({}, "", window.location.pathname);
+    } catch (_) {}
+    switchPublicView("home");
+  });
+
+  document.getElementById("back-from-static-btn")?.addEventListener("click", () => {
+    switchPublicView("home");
+  });
+
+  document
+    .getElementById("reset-all-filters-btn")
+    ?.addEventListener("click", resetToHomeFeed);
+
+  document.getElementById("load-more-posts-btn")?.addEventListener("click", () => {
+    state.visiblePostsLimit += 12;
+    renderPublicPostsFeed();
+  });
+
+  // البحث الفوري
+  const searchForm = document.getElementById("public-search-form");
+  const searchInput = document.getElementById("public-search-input");
+  const clearBtn = document.getElementById("clear-search-btn");
+
+  searchForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    state.searchQuery = (searchInput?.value || "").trim();
+    switchPublicView("home");
+    renderAllHomeSections();
+  });
+
+  searchInput?.addEventListener("input", () => {
+    const val = (searchInput.value || "").trim();
+    state.searchQuery = val;
+    clearBtn?.classList.toggle("hidden", !val);
+    if (state.activeView !== "home") switchPublicView("home");
+    renderAllHomeSections();
+  });
+
+  clearBtn?.addEventListener("click", () => {
+    if (searchInput) searchInput.value = "";
+    state.searchQuery = "";
+    clearBtn.classList.add("hidden");
+    renderAllHomeSections();
+  });
+
+  // فتح الصفحات الثابتة (من القائمة الجانبية أو التذييل)
+  document.querySelectorAll("[data-open-page]").forEach((btn) => {
+    btn.addEventListener("click", () =>
+      openStaticPage(btn.getAttribute("data-open-page"))
+    );
+  });
+
+  window.addEventListener("popstate", () => {
+    checkUrlParamsOnLoad(false);
+  });
+}
+
+function checkUrlParamsOnLoad(allowPush = false) {
+  const params = new URLSearchParams(window.location.search);
+  const postId = params.get("post");
+  const authorKey = params.get("author");
+
+  if (postId && state.posts.length) {
+    openArticleReader(postId, allowPush);
+  } else if (authorKey && (state.staff.length || state.posts.length)) {
+    openAuthorProfile(authorKey, allowPush);
+  } else {
+    switchPublicView("home");
+  }
+}
+
+// ==================== 16. المزامنة الحية مع قاعدة بيانات Firebase ====================
+function startPublicRealtimeSync() {
+  onSnapshot(doc(db, "settings", "general"), (snap) => {
+    if (snap.exists()) {
+      state.settings = { ...state.settings, ...snap.data() };
+    }
+    applyDynamicSiteIdentity();
+    renderAllHomeSections();
+  });
+
+  onSnapshot(collection(db, "categories"), (snap) => {
+    if (!snap.empty) {
+      const dbCats = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const merged = [...DEFAULT_COMPASSES];
+      dbCats.forEach((cat) => {
+        const idx = merged.findIndex(
+          (m) => m.id === cat.id || m.name === cat.name
+        );
+        if (idx >= 0) merged[idx] = { ...merged[idx], ...cat };
+        else merged.push(cat);
+      });
+      state.compasses = merged;
+    }
+    renderCompassesNavigation();
+    renderAllHomeSections();
+  });
+
+  onSnapshot(collection(db, "staff"), (snap) => {
+    state.staff = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderWritersStrip();
+    renderPublicPostsFeed();
+    renderMasterSidebarContents();
+  });
+
+  let initialUrlHandled = false;
+  onSnapshot(collection(db, "posts"), (snap) => {
+    state.posts = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => getPostTimestampMs(b) - getPostTimestampMs(a));
+
+    renderAllHomeSections();
+    renderMasterSidebarContents();
+
+    if (!initialUrlHandled) {
+      initialUrlHandled = true;
+      checkUrlParamsOnLoad(false);
+    } else if (state.activeView === "article" && state.currentArticleId) {
+      openArticleReader(state.currentArticleId, false);
+    }
+  });
+
+  onSnapshot(collection(db, "ads"), (snap) => {
+    state.ads = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderPublicAds();
+  });
+}
+
+// ==================== 17. نقطة انطلاق الموقع العام النظيف (حُجرية بريس) ====================
+document.addEventListener("DOMContentLoaded", () => {
+  initYemenWeatherStrip();
+  applyDynamicSiteIdentity();
+  renderCompassesNavigation();
+  bindPublicEvents();
+  startPublicRealtimeSync();
+});
