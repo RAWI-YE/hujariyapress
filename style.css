@@ -1,7 +1,7 @@
 /* ==========================================================================
    حُجرية بريس (Hujariya Press) — التصميم الكلاسيكي النظيف المستوحى من BBC News
-   أبيض مكسور نهاري (#f6f5f2) + بانر أحمر فاتح (#ef3327) حاضن للشعار الأبيض المفرغ
-   أشرطة تمرير تليفزيونية للطقس والأسواق والعاجل + تصنيفات أفقية متحركة لا تضخم البطاقات
+   نسخة مُصلحة بالكامل: دعم الشفافية للشعار والصور المفرغة، تنسيق الروابط والمصادر،
+   ودعم الفيديوهات القصيرة العمودية (9:16) والفيديوهات العريضة (16:9)
    ========================================================================== */
 
 :root {
@@ -150,7 +150,7 @@ button:active {
   color: #fbbf24;
 }
 
-/* ==================== 2. الهيدر الأحمر الفاتح النظيف (BBC Clean Header) ==================== */
+/* ==================== 2. الهيدر النظيف مع دعم كامل للشعار الشفاف المفرغ ==================== */
 .bbc-clean-header {
   background-color: var(--brand-red);
   color: #ffffff;
@@ -188,13 +188,15 @@ button:active {
   font-size: 21px;
 }
 
-/* مكان الشعار أو الاسم النصي في المنتصف */
+/* مكان الشعار الشفاف أو الاسم النصي في المنتصف (بدون أي خلفية سوداء) */
 .header-brand-slot {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   text-decoration: none;
   color: #ffffff;
+  background: transparent !important;
   flex-shrink: 0;
 }
 
@@ -202,6 +204,7 @@ button:active {
   max-height: 44px;
   width: auto;
   object-fit: contain;
+  background: transparent !important;
 }
 
 .header-brand-text {
@@ -498,6 +501,7 @@ button:active {
 .sidebar-logo-img {
   max-height: 32px;
   width: auto;
+  background: transparent !important;
 }
 
 .sidebar-brand-title {
@@ -568,7 +572,6 @@ button:active {
   background-color: #ffffff;
 }
 
-/* شبكة أزرار الأقسام المباشرة داخل القائمة الجانبية */
 .sidebar-direct-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -694,7 +697,20 @@ button:active {
   flex-shrink: 0;
 }
 
-/* ==================== 8. الخبر الرئيسي، شريط النبض المدمج، وشبكة البطاقات ==================== */
+.card-video-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background-color: #141417;
+  color: #ffffff;
+  font-size: 0.69rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ==================== 8. الخبر الرئيسي، النبض، وشريط الفيديوهات القصيرة (BBC Shorts) ==================== */
 .main-workspace {
   padding-top: 16px;
   padding-bottom: 36px;
@@ -729,7 +745,7 @@ button:active {
   color: var(--text-muted);
 }
 
-/* الخبر الرئيسي البارز (BBC Hero Card) */
+/* الخبر الرئيسي البارز (بدون خلفية سوداء تشوه الصور الشفافة) */
 .hero-featured-section {
   margin-bottom: 18px;
 }
@@ -747,14 +763,16 @@ button:active {
   height: 100%;
   min-height: 280px;
   max-height: 360px;
-  background-color: #18181b;
+  background-color: var(--bg-subtle);
   overflow: hidden;
+  position: relative;
 }
 
 .lead-story-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background: transparent;
 }
 
 .lead-story-body {
@@ -810,7 +828,7 @@ button:active {
   font-size: 15px !important;
 }
 
-/* شريط موجز الأخبار السريعة الأفقي الأنيق وغير المزعج */
+/* شريط موجز الأخبار السريعة */
 .quick-pulse-strip-section {
   background-color: var(--bg-card);
   border: 1px solid var(--border-light);
@@ -897,6 +915,86 @@ button:active {
   overflow: hidden;
 }
 
+/* شريط الفيديوهات القصيرة العمودية (BBC Shorts / Reels 9:16) */
+.shorts-reels-section {
+  margin-bottom: 24px;
+}
+
+.shorts-horizontal-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.shorts-horizontal-row::-webkit-scrollbar {
+  display: none;
+}
+
+.short-reel-card {
+  width: 175px;
+  aspect-ratio: 9 / 15;
+  background-color: var(--brand-red);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.short-reel-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+
+.short-reel-card:hover img {
+  transform: scale(1.04);
+}
+
+.short-reel-overlay {
+  position: relative;
+  z-index: 2;
+  padding: 28px 10px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.45) 65%, transparent 100%);
+  color: #ffffff;
+}
+
+.short-play-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  background-color: rgba(239, 51, 39, 0.92);
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.short-reel-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #ffffff;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* ==================== 9. شبكة بطاقات الأخبار المرتبة بالمسطرة ==================== */
 .bbc-news-section {
   margin-bottom: 26px;
@@ -929,18 +1027,20 @@ button:active {
 .bbc-card-thumb {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background-color: var(--brand-red);
+  background-color: var(--bg-subtle);
   overflow: hidden;
   border-bottom: 1px solid var(--border-light);
+  position: relative;
 }
 
 .bbc-card-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background: transparent;
 }
 
-/* الصورة الافتراضية للمنشورات التي ليس لها صورة مرفقة */
+/* الصورة الافتراضية للمنشورات بدون صورة (بخلفية لون الهوية ودعم الشعار المفرغ الشفاف) */
 .brand-fallback-thumb {
   width: 100%;
   height: 100%;
@@ -958,6 +1058,7 @@ button:active {
   max-height: 52px;
   width: auto;
   object-fit: contain;
+  background: transparent !important;
 }
 
 .brand-fallback-name {
@@ -997,7 +1098,7 @@ button:active {
   overflow: hidden;
 }
 
-/* ==================== 10. زاوية الكُتّاب وصفحة قراءة المقال ==================== */
+/* ==================== 10. قارئ المقال، تنسيق الروابط والمصادر، ومشغل الفيديوهات ==================== */
 .bbc-writers-section {
   margin-bottom: 24px;
 }
@@ -1082,6 +1183,7 @@ button:active {
   line-height: 1.38;
   color: var(--text-main);
   margin-bottom: 12px;
+  word-wrap: break-word;
 }
 
 .article-lead-summary {
@@ -1092,6 +1194,7 @@ button:active {
   font-weight: 700;
   color: var(--text-body);
   margin-bottom: 14px;
+  word-wrap: break-word;
 }
 
 .article-byline-bar {
@@ -1153,26 +1256,37 @@ button:active {
   font-size: 18px;
 }
 
+/* صورة المقال البارزة بدون خلفية سوداء قسرية */
 .article-main-figure {
   margin-bottom: 18px;
-  background-color: #18181b;
+  background-color: transparent;
   border: 1px solid var(--border-light);
+  overflow: hidden;
 }
 
 .article-main-figure img {
   width: 100%;
-  max-height: 480px;
+  max-height: 500px;
   object-fit: cover;
+  background: transparent;
 }
 
+/* مشغل الفيديو الذكي (يدعم العريض 16:9 والعمودي القصير 9:16 بطابع BBC Shorts) */
 .article-video-embed {
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+.video-frame-landscape {
   position: relative;
   padding-bottom: 56.25%;
   height: 0;
-  margin-bottom: 18px;
+  background-color: #000000;
+  border: 1px solid var(--border-light);
 }
 
-.article-video-embed iframe {
+.video-frame-landscape iframe,
+.video-frame-landscape video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1180,10 +1294,31 @@ button:active {
   border: 0;
 }
 
+.video-frame-vertical {
+  max-width: 350px;
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  background-color: #000000;
+  border: 2px solid var(--brand-red);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.video-frame-vertical iframe,
+.video-frame-vertical video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* تنسيق نص المقال والروابط والمصادر بأمان وأناقة */
 .article-body-prose {
   font-size: 1.04rem;
-  line-height: 1.88;
+  line-height: 1.9;
   color: var(--text-main);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .article-body-prose p {
@@ -1204,6 +1339,29 @@ button:active {
   background-color: var(--bg-page);
   border-right: 3px solid var(--brand-red);
   font-weight: 700;
+}
+
+.article-body-prose ul,
+.article-body-prose ol {
+  margin: 10px 22px 14px 0;
+}
+
+/* تنسيق الروابط والمصادر داخل المقال حتى لا تكسر الصفحة أبداً */
+.article-body-prose a {
+  color: var(--brand-red);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0 3px;
+  border-radius: 2px;
+  background-color: rgba(239, 51, 39, 0.06);
+  word-break: break-all;
+}
+
+.article-body-prose a:hover {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  text-decoration: none;
 }
 
 .article-bottom-share {
@@ -1343,7 +1501,8 @@ button:active {
 
 .ad-banner-card img {
   max-height: 70px;
-  object-fit: cover;
+  object-fit: contain;
+  background: transparent;
 }
 
 /* ==================== 11. التذييل النظيف ==================== */
@@ -1370,6 +1529,7 @@ button:active {
   max-height: 38px;
   width: auto;
   margin-bottom: 6px;
+  background: transparent !important;
 }
 
 .footer-title {
@@ -1492,5 +1652,8 @@ button:active {
   }
   .lead-story-title {
     font-size: 1.16rem;
+  }
+  .short-reel-card {
+    width: 150px;
   }
 }
