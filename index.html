@@ -45,21 +45,22 @@
       </div>
       <div class="ticker-viewport">
         <div id="regional-weather-track" class="continuous-ticker-track weather-speed">
-          <span>صنعاء 24°C</span><span class="t-sep">•</span>
-          <span>عدن 31°C</span><span class="t-sep">•</span>
-          <span>تعز 26°C</span><span class="t-sep">•</span>
-          <span>المكلا 29°C</span><span class="t-sep">•</span>
-          <span>مأرب 28°C</span><span class="t-sep">•</span>
-          <span>الرياض 30°C</span><span class="t-sep">•</span>
-          <span>مكة المكرمة 33°C</span><span class="t-sep">•</span>
-          <span>جدة 31°C</span>
+          <span>صنعاء <strong dir="ltr">24°C</strong></span><span class="t-sep">•</span>
+          <span>عدن <strong dir="ltr">31°C</strong></span><span class="t-sep">•</span>
+          <span>تعز <strong dir="ltr">26°C</strong></span><span class="t-sep">•</span>
+          <span>الحجرية (التربة) <strong dir="ltr">23°C</strong></span><span class="t-sep">•</span>
+          <span>المكلا <strong dir="ltr">29°C</strong></span><span class="t-sep">•</span>
+          <span>مأرب <strong dir="ltr">28°C</strong></span><span class="t-sep">•</span>
+          <span>الرياض <strong dir="ltr">30°C</strong></span><span class="t-sep">•</span>
+          <span>مكة المكرمة <strong dir="ltr">33°C</strong></span><span class="t-sep">•</span>
+          <span>جدة <strong dir="ltr">31°C</strong></span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- =====================================================================
-       2. الهيدر الكلاسيكي النظيف باللون الأحمر الفاتح (القائمة + الشعار + البحث)
+       2. الهيدر الكلاسيكي النظيف باللون الديناميكي (القائمة + الشعار المفرغ + البحث)
        ===================================================================== -->
   <header class="bbc-clean-header" id="site-header-banner">
     <div class="pub-container header-main-row">
@@ -70,7 +71,7 @@
         <span class="menu-btn-label">القائمة</span>
       </button>
 
-      <!-- وسط الهيدر: مكان الشعار أو الاسم النصي (يُدار بالكامل من الإعدادات) -->
+      <!-- وسط الهيدر: مكان الشعار الشفاف أو الاسم النصي (يُدار بالكامل من الإعدادات) -->
       <a href="#home" id="brand-home-link" class="header-brand-slot" aria-label="حُجرية بريس - الصفحة الرئيسية">
         <img id="site-logo-img" src="" alt="حُجرية بريس" class="header-logo-img hidden">
         <span id="site-text-brand" class="header-brand-text">حُجرية بريس</span>
@@ -91,7 +92,7 @@
   <!-- =====================================================================
        3. شريط مؤشرات الأسواق العالمية والعملات والطاقة (تحت الهيدر مباشرة)
        ===================================================================== -->
-  <div class="markets- strip-bar" aria-label="مؤشرات الأسواق العالمية والعملات">
+  <div class="markets-strip-bar" aria-label="مؤشرات الأسواق العالمية والعملات">
     <div class="pub-container markets-strip-inner">
       <div class="markets-strip-badge">
         <span class="material-symbols-rounded" translate="no">monitoring</span>
@@ -99,13 +100,13 @@
       </div>
       <div class="ticker-viewport">
         <div id="global-markets-track" class="continuous-ticker-track markets-speed">
-          <span class="m-item">الذهب <strong dir="ltr">$2,745.40</strong> <em class="m-up">▲ +0.4%</em></span>
+          <span class="m-item">الذهب <strong dir="ltr">$2,748.20</strong> <em class="m-up">▲ +0.4%</em></span>
           <span class="t-sep">|</span>
-          <span class="m-item">نفط برنت <strong dir="ltr">$74.80</strong> <em class="m-up">▲ +0.8%</em></span>
+          <span class="m-item">نفط برنت <strong dir="ltr">$75.10</strong> <em class="m-up">▲ +0.8%</em></span>
           <span class="t-sep">|</span>
-          <span class="m-item">تاسي السعودي <strong dir="ltr">12,045</strong> <em class="m-up">▲ +0.3%</em></span>
+          <span class="m-item">تاسي السعودي <strong dir="ltr">12,068</strong> <em class="m-up">▲ +0.3%</em></span>
           <span class="t-sep">|</span>
-          <span class="m-item">داو جونز <strong dir="ltr">42,380</strong> <em class="m-up">▲ +0.2%</em></span>
+          <span class="m-item">داو جونز <strong dir="ltr">42,415</strong> <em class="m-up">▲ +0.2%</em></span>
         </div>
       </div>
     </div>
@@ -160,7 +161,7 @@
     </div>
 
     <div class="sidebar-drawer-body">
-      <!-- انتقال مباشر للرئيسية والنبض السريع -->
+      <!-- انتقال مباشر للرئيسية والنبض السريع والفيديوهات القصيرة -->
       <div class="sidebar-section-block">
         <button type="button" id="sidebar-home-btn" class="sidebar-page-link active">
           <span class="material-symbols-rounded" translate="no">home</span>
@@ -169,6 +170,10 @@
         <button type="button" id="sidebar-pulse-page-btn" class="sidebar-page-link">
           <span class="material-symbols-rounded" translate="no">bolt</span>
           <span>صفحة الأخبار السريعة (النبض)</span>
+        </button>
+        <button type="button" id="sidebar-shorts-page-btn" class="sidebar-page-link">
+          <span class="material-symbols-rounded" translate="no">smart_display</span>
+          <span>الفيديوهات القصيرة والمرئيات</span>
         </button>
       </div>
 
@@ -244,11 +249,11 @@
       <!-- التغطية الرئيسية البارزة (Hero Story) -->
       <section id="hero-featured-section" class="hero-featured-section">
         <div id="hero-featured-box" class="bbc-lead-story-slot">
-          <div class="skeleton-box hero-skeleton">جاري تحميل الخبر الرئيسي...</div>
+          <div class="skeleton-box hero-skeleton">جاري تحميل التغطية الرئيسية...</div>
         </div>
       </section>
 
-      <!-- شريط موجز الأخبار السريعة الأنيق والمدمج (مكان هادئ وغير مزعج) -->
+      <!-- شريط موجز الأخبار السريعة الأنيق والمدمج -->
       <section id="quick-pulse-strip-section" class="quick-pulse-strip-section" aria-label="موجز الأخبار السريعة">
         <div class="pulse-strip-header">
           <div class="pulse-header-right">
@@ -260,6 +265,17 @@
         <div id="quick-pulse-feed" class="pulse-horizontal-cards">
           <div class="empty-state-msg">جاري تحميل الموجز...</div>
         </div>
+      </section>
+
+      <!-- شريط الفيديوهات القصيرة والمرئيات (BBC Shorts / Reels 9:16) — يظهر تلقائياً عند وجود فيديوهات -->
+      <section id="shorts-reels-section" class="shorts-reels-section hidden" aria-label="الفيديوهات القصيرة والمرئيات">
+        <div class="bbc-block-header">
+          <span class="bbc-red-mark"></span>
+          <span class="material-symbols-rounded" style="color:var(--brand-red);font-size:20px;" translate="no">smart_display</span>
+          <h2>الفيديوهات القصيرة والمرئيات</h2>
+          <button type="button" id="view-all-shorts-btn" class="pulse-more-btn" style="margin-right:auto;">كل المرئيات</button>
+        </div>
+        <div id="shorts-horizontal-list" class="shorts-horizontal-row"></div>
       </section>
 
       <!-- المساحة الإعلانية الوسطى -->
@@ -299,7 +315,7 @@
     </div>
 
     <!-- =================================================================
-         (ب) واجهة قراءة الخبر الكامل (مع شريط التصنيفات المتحرك وزر المشاركة الذكي بالصورة)
+         (ب) واجهة قراءة الخبر الكامل (مع دعم الفيديوهات القصيرة والعريضة والروابط الآمنة)
          ================================================================= -->
     <article id="view-article" class="app-view hidden">
       <div class="article-top-nav">
@@ -308,7 +324,7 @@
           <span>العودة للأخبار</span>
         </button>
 
-        <!-- شريط تصنيفات المقال الأفقي المتحرك (يتسع لأي عدد من التصنيفات بأناقة) -->
+        <!-- شريط تصنيفات المقال الأفقي المتحرك -->
         <div id="article-categories-badges" class="horizontal-tags-scroll"></div>
       </div>
 
@@ -337,13 +353,13 @@
           </button>
         </div>
 
-        <!-- صورة المقال البارزة (أو الصورة الافتراضية للهوية) -->
-        <figure id="reader-media-figure" class="article-main-figure"></figure>
-
-        <!-- فيديو يوتيوب المضمن إن وجد -->
+        <!-- مشغل الفيديو الذكي (يتكيف تلقائياً: عمودي 9:16 للفيديوهات القصيرة أو عريض 16:9) -->
         <div id="reader-video-box" class="article-video-embed hidden"></div>
 
-        <!-- النص الكامل للخبر -->
+        <!-- صورة المقال البارزة (أو الصورة الافتراضية للهوية بدون خلفية سوداء) -->
+        <figure id="reader-media-figure" class="article-main-figure"></figure>
+
+        <!-- النص الكامل للخبر (مع دعم كامل وآمن للروابط والمصادر والهاشتاجات) -->
         <div id="reader-article-content" class="article-body-prose"></div>
 
         <!-- شريط مشاركة سفلي موحد -->
@@ -355,7 +371,7 @@
           </button>
         </div>
 
-        <!-- شريط الوسوم الأفقي المتحرك -->
+        <!-- شريط الوسوم الأفقي المتحرك (بحد أقصى 3 وسوم) -->
         <div id="reader-tags-box" class="horizontal-tags-scroll article-tags-margin hidden"></div>
       </div>
 
