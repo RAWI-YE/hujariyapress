@@ -1,20 +1,20 @@
 /* ==========================================================================
-   حُجرية بريس (Hujariya Press) — hujariyapress.rawi-ye.com
-   التصميم الصحفي الكلاسيكي النظيف المستوحى من BBC News
-   أبيض مكسور نهاري مريح للعين + هيدر أحمر فاتح (#ef3327) نظيف + شريط عاجل تلفزيوني متحرك
+   حُجرية بريس (Hujariya Press) — التصميم الكلاسيكي النظيف المستوحى من BBC News
+   أبيض مكسور نهاري (#f6f5f2) + بانر أحمر فاتح (#ef3327) حاضن للشعار الأبيض المفرغ
+   أشرطة تمرير تليفزيونية للطقس والأسواق والعاجل + تصنيفات أفقية متحركة لا تضخم البطاقات
    ========================================================================== */
 
 :root {
   --brand-red: #ef3327;
   --brand-red-dark: #c81e14;
-  --breaking-red: #a31616;
+  --breaking-red: #991b1b;
 
   /* خلفية نهارية بيضاء مكسورة مريحة للعين */
   --bg-page: #f6f5f2;
   --bg-card: #ffffff;
   --bg-subtle: #ebe9e4;
 
-  /* نصوص واضحة عالية التباين للقراءة السريعة */
+  /* نصوص واضحة للقراءة الإخبارية السريعة */
   --text-main: #141414;
   --text-body: #2c2c30;
   --text-muted: #66666e;
@@ -22,6 +22,8 @@
   --border-light: #e0ded8;
   --border-med: #c8c5bc;
   --verified-blue: #0284c7;
+  --up-green: #16a34a;
+  --down-red: #dc2626;
 }
 
 *, *::before, *::after {
@@ -56,7 +58,7 @@ button, input {
 
 button {
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
 
 button:active {
@@ -74,13 +76,54 @@ button:active {
   padding: 0 14px;
 }
 
-/* ==================== 1. شريط الطقس العلوي النحيف جداً ==================== */
+/* ==================== محرك الأشرطة التلفزيونية المتحركة (طقس / أسواق / عاجل) ==================== */
+.ticker-viewport {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  direction: rtl;
+}
+
+.continuous-ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  white-space: nowrap;
+  will-change: transform;
+  animation-name: smoothTickerMove;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.weather-speed { animation-duration: 42s; }
+.markets-speed { animation-duration: 38s; }
+.breaking-speed { animation-duration: 28s; }
+
+.ticker-viewport:hover .continuous-ticker-track,
+.ticker-viewport:active .continuous-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes smoothTickerMove {
+  0% { transform: translateX(-10%); }
+  100% { transform: translateX(100%); }
+}
+
+.t-sep {
+  opacity: 0.4;
+  font-size: 0.72rem;
+}
+
+/* ==================== 1. شريط الطقس العلوي النحيف (اليمن والمملكة) ==================== */
 .weather-top-strip {
-  background-color: #18181b;
+  background-color: #141417;
   color: #e4e4e7;
-  height: 28px;
-  font-size: 0.74rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  height: 27px;
+  font-size: 0.73rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   overflow: hidden;
 }
 
@@ -91,44 +134,23 @@ button:active {
   gap: 8px;
 }
 
-.weather-strip-label {
+.weather-strip-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-weight: 800;
   color: #ffffff;
   flex-shrink: 0;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.weather-strip-label .material-symbols-rounded {
+.weather-strip-badge .material-symbols-rounded {
   font-size: 15px;
   color: #fbbf24;
 }
 
-.weather-ticker-viewport {
-  flex: 1;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-}
-
-.weather-ticker-viewport::-webkit-scrollbar {
-  display: none;
-}
-
-.weather-ticker-track {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 700;
-  color: #d4d4d8;
-}
-
-.w-sep {
-  opacity: 0.4;
-}
-
-/* ==================== 2. الهيدر الرئيسي النظيف (BBC Clean Red Banner) ==================== */
+/* ==================== 2. الهيدر الأحمر الفاتح النظيف (BBC Clean Header) ==================== */
 .bbc-clean-header {
   background-color: var(--brand-red);
   color: #ffffff;
@@ -144,14 +166,13 @@ button:active {
   min-height: 44px;
 }
 
-/* زر القائمة الجانبية */
 .header-menu-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   background-color: rgba(0, 0, 0, 0.16);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.32);
   padding: 6px 11px;
   border-radius: 4px;
   font-size: 0.84rem;
@@ -167,7 +188,7 @@ button:active {
   font-size: 21px;
 }
 
-/* مكان الشعار أو الاسم النصي (نظيف تماماً بدون أي إضافات مزعجة) */
+/* مكان الشعار أو الاسم النصي في المنتصف */
 .header-brand-slot {
   display: inline-flex;
   align-items: center;
@@ -184,7 +205,7 @@ button:active {
 }
 
 .header-brand-text {
-  font-size: 1.45rem;
+  font-size: 1.48rem;
   font-weight: 900;
   color: #ffffff;
   letter-spacing: -0.2px;
@@ -206,7 +227,7 @@ button:active {
   padding: 4px 30px 4px 26px;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.45);
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.96);
   color: var(--text-main);
   font-size: 0.8rem;
   font-weight: 700;
@@ -235,11 +256,66 @@ button:active {
   align-items: center;
 }
 
-.clear-search-btn .material-symbols-rounded {
-  font-size: 16px;
+/* ==================== 3. شريط مؤشرات الأسواق العالمية والعملات (تحت الهيدر مباشرة) ==================== */
+.markets-strip-bar {
+  background-color: #1f2024;
+  color: #f4f4f5;
+  height: 29px;
+  font-size: 0.74rem;
+  border-bottom: 1px solid #2e3036;
+  overflow: hidden;
 }
 
-/* ==================== 3. شريط الأقسام الكلاسيكي النظيف ==================== */
+.markets-strip-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.markets-strip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.markets-strip-badge .material-symbols-rounded {
+  font-size: 15px;
+  color: #38bdf8;
+}
+
+.m-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+}
+
+.m-item strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.m-up {
+  color: #4ade80;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 0.7rem;
+}
+
+.m-down {
+  color: #f87171;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 0.7rem;
+}
+
+/* ==================== 4. شريط الأقسام الكلاسيكي النظيف ==================== */
 .bbc-categories-bar {
   background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-light);
@@ -287,7 +363,7 @@ button:active {
   border-bottom-color: var(--brand-red);
 }
 
-/* شريط الفئات الفرعية */
+/* شريط التصنيفات الفرعية */
 .subcategories-bar-wrap {
   background-color: var(--bg-subtle);
   border-bottom: 1px solid var(--border-light);
@@ -323,7 +399,7 @@ button:active {
   color: #ffffff;
 }
 
-/* ==================== 4. شريط الأخبار العاجلة التلفزيوني المتحرك (TV Ticker) ==================== */
+/* ==================== 5. شريط الأخبار العاجلة التلفزيوني المتحرك ==================== */
 .tv-breaking-bar {
   background-color: var(--breaking-red);
   color: #ffffff;
@@ -366,36 +442,6 @@ button:active {
   50% { opacity: 0.25; }
 }
 
-.tv-ticker-viewport {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  direction: rtl;
-}
-
-/* حركة شريط التلفزيون المستمرة بلا نهاية */
-.tv-ticker-track {
-  display: inline-flex;
-  align-items: center;
-  gap: 28px;
-  white-space: nowrap;
-  will-change: transform;
-  animation: tvTickerMove 28s linear infinite;
-}
-
-.tv-ticker-viewport:hover .tv-ticker-track,
-.tv-ticker-viewport:active .tv-ticker-track {
-  animation-play-state: paused;
-}
-
-@keyframes tvTickerMove {
-  0% { transform: translateX(-15%); }
-  100% { transform: translateX(100%); }
-}
-
 .tv-ticker-item {
   background: transparent;
   border: none;
@@ -411,12 +457,7 @@ button:active {
   text-decoration: underline;
 }
 
-.tv-ticker-sep {
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 900;
-}
-
-/* ==================== 5. القائمة الجانبية الشاملة (Master Sidebar Drawer) ==================== */
+/* ==================== 6. القائمة الجانبية الشاملة (فتح صفحات الأقسام مباشرة) ==================== */
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
@@ -436,7 +477,7 @@ button:active {
   z-index: 130;
   display: flex;
   flex-direction: column;
-  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.15);
+  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.16);
 }
 
 .sidebar-drawer-header {
@@ -446,6 +487,17 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.sidebar-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-logo-img {
+  max-height: 32px;
+  width: auto;
 }
 
 .sidebar-brand-title {
@@ -468,154 +520,107 @@ button:active {
 .sidebar-drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
-.sidebar-direct-link {
-  width: 100%;
+.sidebar-section-block {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 4px;
-  border: 1px solid var(--border-light);
-  background-color: var(--bg-page);
-  color: var(--text-main);
-  font-size: 0.9rem;
-  font-weight: 800;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.sidebar-direct-link .material-symbols-rounded {
-  color: var(--brand-red);
-}
-
-/* القوائم المتداخلة (شيء داخل شيء) */
-.sidebar-accordion-group {
-  border: 1px solid var(--border-light);
-  border-radius: 4px;
-  overflow: hidden;
-  background-color: var(--bg-card);
-}
-
-.sidebar-accordion-toggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  background-color: var(--bg-page);
-  border: none;
-  color: var(--text-main);
-  font-size: 0.88rem;
-  font-weight: 800;
-}
-
-.acc-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.acc-title-wrap .material-symbols-rounded {
-  color: var(--brand-red);
-  font-size: 20px;
-}
-
-.acc-arrow {
-  transition: transform 0.2s ease;
-}
-
-.sidebar-accordion-toggle.open .acc-arrow {
-  transform: rotate(180deg);
-}
-
-.sidebar-accordion-content {
-  padding: 8px;
-  border-top: 1px solid var(--border-light);
-  background-color: var(--bg-card);
-}
-
-.sidebar-cat-node {
+.sidebar-block-title {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--text-muted);
+  padding-bottom: 4px;
   border-bottom: 1px solid var(--border-light);
-  padding: 4px 0;
+  margin-bottom: 2px;
 }
 
-.sidebar-cat-node:last-child {
-  border-bottom: none;
+.sidebar-page-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-align: right;
 }
 
-.sidebar-cat-row {
+.sidebar-page-link .material-symbols-rounded {
+  color: var(--brand-red);
+  font-size: 19px;
+}
+
+.sidebar-page-link:hover,
+.sidebar-page-link.active {
+  border-color: var(--brand-red);
+  color: var(--brand-red);
+  background-color: #ffffff;
+}
+
+/* شبكة أزرار الأقسام المباشرة داخل القائمة الجانبية */
+.sidebar-direct-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.sidebar-cat-direct-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.sidebar-cat-main-btn {
-  flex: 1;
-  text-align: right;
-  background: transparent;
-  border: none;
-  padding: 6px 8px;
-  font-size: 0.84rem;
-  font-weight: 800;
-  color: var(--text-body);
-}
-
-.sidebar-cat-main-btn:hover {
-  color: var(--brand-red);
-}
-
-.sidebar-sub-toggle {
-  background: var(--bg-page);
+  padding: 8px 10px;
+  background-color: var(--bg-page);
   border: 1px solid var(--border-light);
+  border-right: 3px solid var(--brand-red);
   border-radius: 3px;
-  padding: 2px 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  text-align: right;
 }
 
-.sidebar-subcats-nested {
-  padding: 4px 14px 6px 4px;
+.sidebar-cat-direct-btn:hover {
+  background-color: var(--brand-red);
+  color: #ffffff;
+}
+
+.sidebar-writers-list,
+.sidebar-pages-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  border-right: 2px solid var(--brand-red);
-  margin-right: 8px;
-  margin-top: 4px;
+  gap: 5px;
 }
 
-.sidebar-sub-btn {
-  text-align: right;
-  background: transparent;
-  border: none;
-  padding: 5px 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  border-radius: 3px;
-}
-
-.sidebar-sub-btn:hover {
+.sidebar-writer-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
   background-color: var(--bg-page);
-  color: var(--brand-red);
-}
-
-.sidebar-socials-section {
-  margin-top: 6px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-light);
-}
-
-.sidebar-section-label {
-  display: block;
-  font-size: 0.76rem;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  text-align: right;
+  font-size: 0.8rem;
   font-weight: 800;
-  color: var(--text-muted);
-  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+.sidebar-writer-btn img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .sidebar-socials-grid {
@@ -625,7 +630,7 @@ button:active {
 }
 
 .sidebar-socials-grid a {
-  padding: 5px 10px;
+  padding: 6px 11px;
   border-radius: 3px;
   background-color: var(--bg-page);
   border: 1px solid var(--border-light);
@@ -651,7 +656,45 @@ button:active {
   justify-content: space-between;
 }
 
-/* ==================== 6. هندسة البطاقات الإخبارية (BBC News Anatomy) ==================== */
+/* ==================== 7. شريط التصنيفات الأفقي المتحرك داخل البطاقات والمقالات ==================== */
+.horizontal-tags-scroll {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  max-width: 100%;
+  padding-bottom: 2px;
+}
+
+.horizontal-tags-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.card-cat-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 2px;
+  background-color: rgba(239, 51, 39, 0.1);
+  color: var(--brand-red);
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.card-subcat-pill {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background-color: var(--bg-subtle);
+  color: var(--text-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ==================== 8. الخبر الرئيسي، شريط النبض المدمج، وشبكة البطاقات ==================== */
 .main-workspace {
   padding-top: 16px;
   padding-bottom: 36px;
@@ -686,30 +729,26 @@ button:active {
   color: var(--text-muted);
 }
 
-/* القسم العلوي: الخبر الرئيسي + الموجز السريع */
-.bbc-top-section {
-  display: grid;
-  grid-template-columns: 1fr 330px;
-  gap: 18px;
-  margin-bottom: 24px;
+/* الخبر الرئيسي البارز (BBC Hero Card) */
+.hero-featured-section {
+  margin-bottom: 18px;
 }
 
-/* بطاقة الخبر الرئيسي (Hero Card) */
 .lead-story-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-light);
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
 }
 
 .lead-story-media {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
+  min-height: 280px;
   max-height: 360px;
   background-color: #18181b;
   overflow: hidden;
-  position: relative;
 }
 
 .lead-story-media img {
@@ -719,23 +758,18 @@ button:active {
 }
 
 .lead-story-body {
-  padding: 14px 16px;
-}
-
-.card-cat-tag {
-  display: inline-block;
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: var(--brand-red);
-  margin-bottom: 4px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .lead-story-title {
-  font-size: 1.35rem;
+  font-size: 1.42rem;
   font-weight: 900;
   line-height: 1.38;
   color: var(--text-main);
-  margin-bottom: 8px;
+  margin: 8px 0 10px;
 }
 
 .lead-story-card:hover .lead-story-title {
@@ -743,12 +777,12 @@ button:active {
 }
 
 .lead-story-summary {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--text-body);
-  line-height: 1.55;
-  margin-bottom: 10px;
+  line-height: 1.6;
+  margin-bottom: 12px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -776,51 +810,94 @@ button:active {
   font-size: 15px !important;
 }
 
-/* عمود الموجز السريع */
-.bbc-side-brief {
+/* شريط موجز الأخبار السريعة الأفقي الأنيق وغير المزعج */
+.quick-pulse-strip-section {
   background-color: var(--bg-card);
   border: 1px solid var(--border-light);
+  border-right: 4px solid var(--brand-red);
   padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 22px;
 }
 
-.bbc-brief-list {
+.pulse-strip-header {
   display: flex;
-  flex-direction: column;
-  max-height: 430px;
-  overflow-y: auto;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.brief-item {
-  padding: 9px 0;
-  border-bottom: 1px solid var(--border-light);
+.pulse-header-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pulse-icon {
+  color: var(--brand-red);
+  font-size: 20px;
+}
+
+.pulse-header-right h2 {
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.pulse-more-btn {
+  background: var(--bg-page);
+  border: 1px solid var(--border-light);
+  padding: 2px 9px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--brand-red);
+  border-radius: 3px;
+}
+
+.pulse-horizontal-cards {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.pulse-horizontal-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.pulse-mini-card {
+  min-width: 245px;
+  max-width: 270px;
+  padding: 8px 11px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.brief-item:last-child {
-  border-bottom: none;
+.pulse-mini-card:hover .brief-item-title {
+  color: var(--brand-red);
 }
 
 .brief-item-time {
-  font-size: 0.7rem;
+  font-size: 0.69rem;
   font-weight: 800;
   color: var(--brand-red);
   display: block;
+  margin-bottom: 2px;
 }
 
 .brief-item-title {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: var(--text-main);
-  line-height: 1.42;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.brief-item:hover .brief-item-title {
-  color: var(--brand-red);
-}
-
-/* ==================== 7. شبكة بطاقات الأخبار المرتبة بالمسطرة ==================== */
+/* ==================== 9. شبكة بطاقات الأخبار المرتبة بالمسطرة ==================== */
 .bbc-news-section {
   margin-bottom: 26px;
 }
@@ -838,6 +915,7 @@ button:active {
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .bbc-news-card:hover {
@@ -862,7 +940,7 @@ button:active {
   object-fit: cover;
 }
 
-/* الصورة الافتراضية النظيفة للمنشورات التي ليس لها صورة */
+/* الصورة الافتراضية للمنشورات التي ليس لها صورة مرفقة */
 .brand-fallback-thumb {
   width: 100%;
   height: 100%;
@@ -893,6 +971,7 @@ button:active {
   flex-direction: column;
   flex: 1;
   justify-content: space-between;
+  min-width: 0;
 }
 
 .bbc-card-title {
@@ -900,7 +979,7 @@ button:active {
   font-weight: 900;
   line-height: 1.42;
   color: var(--text-main);
-  margin: 3px 0 6px;
+  margin: 6px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -918,7 +997,7 @@ button:active {
   overflow: hidden;
 }
 
-/* ==================== 8. زاوية الكُتّاب الأنيقة ==================== */
+/* ==================== 10. زاوية الكُتّاب وصفحة قراءة المقال ==================== */
 .bbc-writers-section {
   margin-bottom: 24px;
 }
@@ -944,6 +1023,7 @@ button:active {
   border: 1px solid var(--border-light);
   min-width: 210px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .writer-clean-card img {
@@ -968,7 +1048,6 @@ button:active {
   color: var(--text-muted);
 }
 
-/* ==================== 9. صفحة قراءة المقال وزر المشاركة الموحد ==================== */
 .article-top-nav {
   display: flex;
   align-items: center;
@@ -987,6 +1066,7 @@ button:active {
   color: var(--text-main);
   font-size: 0.82rem;
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 .bbc-article-sheet {
@@ -1052,7 +1132,6 @@ button:active {
   color: var(--text-muted);
 }
 
-/* زر المشاركة الموحد فقط */
 .btn-unified-share {
   display: inline-flex;
   align-items: center;
@@ -1141,20 +1220,20 @@ button:active {
   font-weight: 800;
 }
 
-.article-tags-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.article-tags-margin {
   margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
 }
 
 .tag-chip {
-  padding: 3px 9px;
+  padding: 3px 10px;
   background-color: var(--bg-page);
   border: 1px solid var(--border-light);
   color: var(--text-body);
   font-size: 0.76rem;
   font-weight: 800;
+  flex-shrink: 0;
 }
 
 .inline-hashtag {
@@ -1200,30 +1279,32 @@ button:active {
   margin-top: 4px;
 }
 
-/* عناصر مساعدة وإعلانات */
+/* عناصر التصفية والإعلانات */
 .active-filter-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 9px 14px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-right: 3px solid var(--brand-red);
-  margin-bottom: 14px;
-  font-size: 0.84rem;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
 }
 
 .filter-banner-info {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .btn-clean-reset {
-  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
   background-color: var(--bg-page);
   border: 1px solid var(--border-med);
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
@@ -1242,11 +1323,6 @@ button:active {
   color: var(--text-main);
   font-size: 0.85rem;
   font-weight: 800;
-}
-
-.btn-load-more:hover {
-  border-color: var(--brand-red);
-  color: var(--brand-red);
 }
 
 .ad-slot-container {
@@ -1270,7 +1346,7 @@ button:active {
   object-fit: cover;
 }
 
-/* ==================== 10. التذييل النظيف ==================== */
+/* ==================== 11. التذييل النظيف ==================== */
 .bbc-clean-footer {
   background-color: #18181b;
   color: #d4d4d8;
@@ -1309,6 +1385,27 @@ button:active {
   margin-top: 4px;
 }
 
+.footer-socials-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.footer-socials-row a {
+  padding: 3px 9px;
+  background-color: #27272a;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 3px;
+}
+
+.footer-socials-row a:hover {
+  background-color: var(--brand-red);
+}
+
 .footer-quick-links {
   display: flex;
   flex-wrap: wrap;
@@ -1321,11 +1418,6 @@ button:active {
   color: #e4e4e7;
   font-size: 0.8rem;
   font-weight: 700;
-}
-
-.footer-link-btn:hover {
-  color: #ffffff;
-  text-decoration: underline;
 }
 
 .footer-bottom-row {
@@ -1350,7 +1442,7 @@ button:active {
   font-size: 0.82rem;
   font-weight: 800;
   z-index: 200;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .skeleton-box {
@@ -1366,13 +1458,16 @@ button:active {
 }
 
 .hero-skeleton {
-  height: 340px;
+  height: 300px;
 }
 
-/* توافق شاشات الجوال والأجهزة اللوحية */
-@media (max-width: 960px) {
-  .bbc-top-section {
+/* توافق الشاشات الصغيرة والجوال */
+@media (max-width: 860px) {
+  .lead-story-card {
     grid-template-columns: 1fr;
+  }
+  .lead-story-media {
+    min-height: 210px;
   }
 }
 
@@ -1381,13 +1476,13 @@ button:active {
     display: none;
   }
   .header-brand-text {
-    font-size: 1.22rem;
+    font-size: 1.24rem;
   }
   .header-logo-img {
     max-height: 36px;
   }
   .header-search-form {
-    width: 148px;
+    width: 146px;
   }
   .bbc-article-sheet {
     padding: 14px;
@@ -1396,6 +1491,6 @@ button:active {
     font-size: 1.28rem;
   }
   .lead-story-title {
-    font-size: 1.15rem;
+    font-size: 1.16rem;
   }
 }
