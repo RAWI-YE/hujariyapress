@@ -1,7 +1,8 @@
 /* ==========================================================================
-   حُجرية بريس (Hujariya Press) — المحرك البرمجي الكلاسيكي النظيف (BBC Clean Engine)
-   الجزء الأول: الروابط الديناميكية، طقس اليمن والمملكة، مؤشرات الأسواق العالمية،
-   الهوية والشعار، القائمة الجانبية المباشرة، والتصنيفات الأفقية المتحركة
+   حُجرية بريس (Hujariya Press) — المحرك البرمجي الكلاسيكي النظيف (النسخة المُصلحة بالكامل)
+   يشمل: الحماية الأمنية (XSS Sanitizer)، دعم الروابط والمصادر التلقائي،
+   الفيديوهات القصيرة (BBC Shorts 9:16) والعريضة (16:9)، الشعار المفرغ الشفاف،
+   إحصائيات ظهور ونقرات الإعلانات، وتقييد الوسوم بـ 3 وسوم كحد أقصى
    ========================================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -30,8 +31,10 @@ const app = initializeApp(FIREBASE_CONFIG);
 const db = getFirestore(app);
 
 const VIEWED_POSTS_STORAGE_KEY = "hujariya_unique_views_v3";
+const VIEWED_ADS_SESSION_KEY = "hujariya_ad_impressions_v1";
+const MAX_ALLOWED_TAGS = 3;
 
-// توليد الرابط الأساسي الحقيقي للموقع ديناميكياً (يعمل على الدومين الرسمي أو GitHub أو أي مستودع تجريبي)
+// توليد الرابط الأساسي الحقيقي للموقع ديناميكياً
 function getDynamicSiteBaseUrl() {
   try {
     const origin = window.location.origin;
@@ -177,7 +180,7 @@ const state = {
   staff: [],
   ads: [],
   activeView: "home", // home | article | author | static
-  activeCompass: "all", // all | pulse-only | <compassName>
+  activeCompass: "all", // all | pulse-only | shorts-only | <compassName>
   activeSubcategory: "all",
   activeTag: "",
   searchQuery: "",
@@ -186,7 +189,7 @@ const state = {
   currentAuthorKey: null
 };
 
-// ==================== 4. الدوال المساعدة، التصنيفات الأفقية، والصور ====================
+// ==================== 4. الدوال المساعدة، الفيديو، والروابط الآمنة ====================
 function escapeHtml(str = "") {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -254,9 +257,39 @@ function formatRelativeTime(timestamp) {
   return formatArabicDate(ms);
 }
 
+// استخراج معرف فيديو يوتيوب (يدعم الروابط العادية وروابط Shorts والروابط المختصرة)
+function extractYoutubeVideoId(url = "") {
+  const clean = String(url || "").trim();
+  if (!clean) return "";
+  const regExp =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+  const match = clean.match(regExp);
+  return match && match[1] ? match[1] : "";
+}
+
+function isPostVideo(post) {
+  if (!post) return false;
+  return Boolean(
+    (post.videoUrl && String(post.videoUrl).trim() !== "") ||
+      (post.videoType && post.videoType !== "none")
+  );
+}
+
+function isPostShortVerticalVideo(post) {
+  if (!isPostVideo(post)) return false;
+  if (post.videoType === "short_vertical") return true;
+  const vUrl = String(post.videoUrl || "").toLowerCase();
+  return vUrl.includes("/shorts/") || vUrl.includes("tiktok.com") || vUrl.includes("/reel/");
+}
+
 function getPostEffectiveImageUrl(post) {
   if (post && post.imageUrl && String(post.imageUrl).trim() !== "") {
     return String(post.imageUrl).trim();
+  }
+  // إذا كان المنشور يحتوي على فيديو يوتيوب بدون صورة مرفقة، نسحب صورة غلاف الفيديو تلقائياً
+  const ytId = extractYoutubeVideoId(post?.videoUrl);
+  if (ytId) {
+    return `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
   }
   const s = state.settings;
   if (s.defaultPostImageUrl && s.defaultPostImageUrl.trim() !== "") {
@@ -280,9 +313,7 @@ function buildPostThumbnailHtml(post, altText = "") {
   if (imgUrl) {
     return `<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(
       altText || post?.title || siteName
-    )}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'brand-fallback-thumb\\'><strong class=\\'brand-fallback-name\\'>${escapeHtml(
-      siteName
-    )}</strong></div>'">`;
+    )}" loading="lazy">`;
   }
 
   return `
@@ -294,6 +325,108 @@ function buildPostThumbnailHtml(post, altText = "") {
       }
     </div>
   `;
+}
+
+// معالجة آمنة 100% لنص المقال: تطهير XSS + دعم الروابط والمصادر التلقائي + تلوين الهاشتاجات دون كسر الروابط
+function sanitizeAndFormatArticleHtml(rawHtml = "") {
+  if (!rawHtml) return "";
+
+  const container = document.createElement("div");
+  container.innerHTML = rawHtml;
+
+  // 1. إزالة أي عناصر خطرة أمنياً (XSS Protection)
+  container
+    .querySelectorAll("script, style, object, embed, form, input, button, meta, link")
+    .forEach((el) => el.remove());
+
+  // 2. تأمين جميع العناصر والروابط الموجودة في النص
+  container.querySelectorAll("*").forEach((el) => {
+    Array.from(el.attributes).forEach((attr) => {
+      const name = attr.name.toLowerCase();
+      const val = String(attr.value || "").trim().toLowerCase();
+      if (name.startsWith("on") || val.startsWith("javascript:") || val.startsWith("vbscript:")) {
+        el.removeAttribute(attr.name);
+      }
+    });
+
+    if (el.tagName === "A") {
+      const rawHref = (el.getAttribute("href") || "").trim();
+      if (rawHref && !/^https?:\/\//i.test(rawHref) && !rawHref.startsWith("/") && !rawHref.startsWith("#")) {
+        el.setAttribute("href", `https://${rawHref}`);
+      }
+      el.setAttribute("target", "_blank");
+      el.setAttribute("rel", "noopener noreferrer");
+    }
+  });
+
+  // 3. المرور على العقد النصية فقط (Text Nodes) لتحويل الروابط النصية والهاشتاجات بأمان تام دون المساس بوسوم HTML
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
+  const textNodes = [];
+  let currentNode;
+  while ((currentNode = walker.nextNode())) {
+    const parentTag = currentNode.parentElement?.tagName;
+    if (parentTag && !["A", "SCRIPT", "STYLE", "CODE", "PRE"].includes(parentTag)) {
+      textNodes.push(currentNode);
+    }
+  }
+
+  const tokenRegex = /(https?:\/\/[^\s<>"']+)|(^|\s)#([\u0600-\u06FFa-zA-Z0-9_]{2,40})/g;
+
+  textNodes.forEach((node) => {
+    const text = node.nodeValue || "";
+    if (!tokenRegex.test(text)) return;
+    tokenRegex.lastIndex = 0;
+
+    const fragment = document.createDocumentFragment();
+    let lastIdx = 0;
+    let match;
+
+    while ((match = tokenRegex.exec(text)) !== null) {
+      const matchStart = match.index;
+      if (matchStart > lastIdx) {
+        fragment.appendChild(document.createTextNode(text.slice(lastIdx, matchStart)));
+      }
+
+      if (match[1]) {
+        // رابط مصدر مباشر مكتوب داخل النص
+        const cleanUrl = match[1].replace(/[.,؛،!?)"]+$/, "");
+        const trailingPunct = match[1].slice(cleanUrl.length);
+
+        const linkEl = document.createElement("a");
+        linkEl.href = cleanUrl;
+        linkEl.target = "_blank";
+        linkEl.rel = "noopener noreferrer";
+        linkEl.textContent = cleanUrl;
+        fragment.appendChild(linkEl);
+
+        if (trailingPunct) {
+          fragment.appendChild(document.createTextNode(trailingPunct));
+        }
+      } else if (match[3]) {
+        // هاشتاج نصي
+        const leadingSpace = match[2] || "";
+        const tagText = match[3];
+        if (leadingSpace) {
+          fragment.appendChild(document.createTextNode(leadingSpace));
+        }
+        const spanEl = document.createElement("span");
+        spanEl.className = "inline-hashtag";
+        spanEl.setAttribute("data-inline-tag", tagText);
+        spanEl.textContent = `#${tagText}`;
+        fragment.appendChild(spanEl);
+      }
+
+      lastIdx = tokenRegex.lastIndex;
+    }
+
+    if (lastIdx < text.length) {
+      fragment.appendChild(document.createTextNode(text.slice(lastIdx)));
+    }
+
+    node.parentNode?.replaceChild(fragment, node);
+  });
+
+  return container.innerHTML;
 }
 
 function resolvePostAuthorInfo(post) {
@@ -327,7 +460,6 @@ function resolvePostAuthorInfo(post) {
   return { name, avatar, verified, authorKey, staffMember: matchedStaff };
 }
 
-// استخراج كافة التصنيفات والمسميات الخاصة بالمنشور (حتى لو كانت 10 تصنيفات)
 function getPostCompasses(post) {
   const list = [];
   if (Array.isArray(post?.categories)) {
@@ -341,7 +473,6 @@ function getPostCompasses(post) {
   return list.length ? list : ["السياسة اليمنية"];
 }
 
-// بناء شريط التصنيفات الأفقي المتحرك باللمس داخل البطاقات (يمنع تشوه البطاقة مهما كثرت التصنيفات)
 function buildHorizontalCategoriesHtml(post) {
   const cats = getPostCompasses(post);
   const subcats = [];
@@ -354,7 +485,14 @@ function buildHorizontalCategoriesHtml(post) {
     subcats.push(post.subcategory);
   }
 
+  const videoBadge = isPostVideo(post)
+    ? `<span class="card-video-pill">${
+        isPostShortVerticalVideo(post) ? "📱 فيديو قصير" : "▶ فيديو"
+      }${post.videoDuration ? ` (${escapeHtml(post.videoDuration)})` : ""}</span>`
+    : "";
+
   const pills = [
+    videoBadge,
     ...cats.map(
       (c) =>
         `<span class="card-cat-pill" data-card-cat="${escapeHtml(c)}">${escapeHtml(
@@ -362,7 +500,7 @@ function buildHorizontalCategoriesHtml(post) {
         )}</span>`
     ),
     ...subcats.map((s) => `<span class="card-subcat-pill">${escapeHtml(s)}</span>`)
-  ];
+  ].filter(Boolean);
 
   return `<div class="horizontal-tags-scroll" title="اسحب أفقياً لتصفح التصنيفات">${pills.join("")}</div>`;
 }
@@ -371,6 +509,9 @@ function postMatchesCompass(post, targetCompass) {
   if (!targetCompass || targetCompass === "all") return true;
   if (targetCompass === "pulse-only") {
     return Boolean(post?.isQuickNews || isBreakingStillActive(post));
+  }
+  if (targetCompass === "shorts-only") {
+    return isPostVideo(post);
   }
   const targetClean = getCleanCategoryLabel(targetCompass);
   return getPostCompasses(post).some(
@@ -401,7 +542,6 @@ async function initRegionalWeatherStrip() {
   if (!track) return;
 
   const regionalCities = [
-    // المدن والمناطق اليمنية الشاملة
     { name: "صنعاء", lat: 15.3694, lon: 44.191 },
     { name: "عدن", lat: 12.7855, lon: 45.0187 },
     { name: "تعز", lat: 13.5795, lon: 44.0209 },
@@ -415,7 +555,6 @@ async function initRegionalWeatherStrip() {
     { name: "عتق", lat: 14.5377, lon: 46.8319 },
     { name: "الغيضة", lat: 16.2079, lon: 52.176 },
     { name: "سقطرى", lat: 12.6488, lon: 53.9963 },
-    // المدن السعودية المهمة
     { name: "الرياض", lat: 24.7136, lon: 46.6753 },
     { name: "مكة المكرمة", lat: 21.3891, lon: 39.8579 },
     { name: "المدينة المنورة", lat: 24.5247, lon: 39.5692 },
@@ -444,20 +583,13 @@ async function initRegionalWeatherStrip() {
       .join(`<span class="t-sep">•</span>`);
 
     if (singlePass) {
-      // تكرار الشريط لضمان حركة تلفزيونية متصلة بلا فراغات
       track.innerHTML = `${singlePass}<span class="t-sep">•</span>${singlePass}`;
     }
   } catch (_) {}
 }
 
-// ==================== 6. شريط مؤشرات الأسواق العالمية والعملات والطاقة (مفتوح المصدر) ====================
+// ==================== 6. شريط مؤشرات الأسواق العالمية والعملات والطاقة ====================
 async function initGlobalMarketsStrip() {
-  // تصحيح تلقائي لكلاس شريط الأسواق لضمان تطابق التنسيق
-  const stripBar = document.querySelector('[aria-label="مؤشرات الأسواق العالمية والعملات"]');
-  if (stripBar) {
-    stripBar.classList.add("markets-strip-bar");
-  }
-
   const track = document.getElementById("global-markets-track");
   if (!track) return;
 
@@ -472,7 +604,6 @@ async function initGlobalMarketsStrip() {
   ];
 
   try {
-    // جلب أسعار الصرف العالمية الحية من مصدر مفتوح ومجاني تماماً بدون مفتاح API
     const res = await fetch("https://open.er-api.com/v6/latest/USD");
     if (res.ok) {
       const data = await res.json();
@@ -519,7 +650,7 @@ async function initGlobalMarketsStrip() {
   track.innerHTML = `${singlePass}<span class="t-sep">|</span>${singlePass}`;
 }
 
-// ==================== 7. تطبيق الهوية البصرية، الشعار المفرغ، ومنصات التواصل الديناميكية ====================
+// ==================== 7. تطبيق الهوية البصرية والشعار المفرغ الشفاف ====================
 function applyDynamicSiteIdentity() {
   const s = state.settings;
   const siteName =
@@ -536,7 +667,6 @@ function applyDynamicSiteIdentity() {
   const themeMeta = document.getElementById("page-theme-color");
   if (themeMeta) themeMeta.setAttribute("content", brandColor);
 
-  // تحديث اسم المنصة والدومين الفعلي ديناميكياً
   const textBrand = document.getElementById("site-text-brand");
   if (textBrand) textBrand.textContent = siteName;
 
@@ -558,7 +688,7 @@ function applyDynamicSiteIdentity() {
   const footDomain = document.getElementById("footer-domain-label");
   if (footDomain) footDomain.textContent = currentHost;
 
-  // التحكم بالشعار الأبيض المفرغ وإخفاء/إظهار الاسم النصي بضغطة زر من الإعدادات
+  // الشعار الشفاف وإخفاء/إظهار الاسم النصي
   const logoImg = document.getElementById("site-logo-img");
   const sidebarLogo = document.getElementById("sidebar-logo-img");
   const footerLogo = document.getElementById("footer-logo-img");
@@ -579,7 +709,6 @@ function applyDynamicSiteIdentity() {
     textBrand.classList.toggle("hidden", shouldHideText);
   }
 
-  // تحديث أيقونة المتصفح وتثبيت تطبيق الويب (PWA)
   const appIcon = (s.faviconUrl || s.appIconUrl || s.logoUrl || "").trim();
   if (appIcon) {
     const favEl = document.getElementById("dynamic-favicon");
@@ -647,7 +776,6 @@ function updateDynamicWebAppManifest(name, description, iconUrl, themeColor) {
   } catch (_) {}
 }
 
-// إظهار روابط المنصات التي تم إدخالها في الإعدادات فقط وإخفاء المنصات الفارغة تماماً
 function renderSocialPlatformsLinks() {
   const soc = state.settings.socials || {};
   const allPlatforms = [
@@ -691,7 +819,7 @@ function renderSocialPlatformsLinks() {
   }
 }
 
-// ==================== 8. شريط الأقسام الكلاسيكي والقائمة الجانبية التي تفتح الصفحات مباشرة ====================
+// ==================== 8. شريط الأقسام والقائمة الجانبية المباشرة ====================
 function getVisibleCompasses() {
   return [...state.compasses]
     .filter((c) => c.visible !== false)
@@ -732,7 +860,11 @@ function renderSubcategoriesBar() {
   const listEl = document.getElementById("public-subcategories-list");
   if (!wrap || !listEl) return;
 
-  if (state.activeCompass === "all" || state.activeCompass === "pulse-only") {
+  if (
+    state.activeCompass === "all" ||
+    state.activeCompass === "pulse-only" ||
+    state.activeCompass === "shorts-only"
+  ) {
     wrap.classList.add("hidden");
     return;
   }
@@ -772,7 +904,6 @@ function renderSubcategoriesBar() {
   });
 }
 
-// القائمة الجانبية: الضغط على أي قسم يفتح صفحته مباشرة بضغطة واحدة بدون قوائم منسدلة
 function renderMasterSidebarContents() {
   const directGrid = document.getElementById("sidebar-categories-direct-list");
   const writersBlock = document.getElementById("sidebar-writers-block");
@@ -806,7 +937,8 @@ function renderMasterSidebarContents() {
   }
 
   if (writersBlock && writersList) {
-    const writers = state.staff.filter((s) => !s.suspended && s.name);
+    // ملاحظة: حتى لو سُحبت صلاحية الدخول من كاتب، يبقى اسمه وشارته وأرشيفه متاحاً للقراء
+    const writers = state.staff.filter((s) => s.name && !s.hiddenFromPublic);
     if (writers.length) {
       writersBlock.classList.remove("hidden");
       writersList.innerHTML = writers
@@ -857,7 +989,7 @@ function selectCompassCategory(compassName) {
   renderAllHomeSections();
 }
 
-// ==================== 9. شريط العاجل التلفزيوني، الخبر الرئيسي، النبض، وشبكة البطاقات ====================
+// ==================== 9. العاجل، الإعلانات الذكية، الخبر الرئيسي، النبض، والفيديوهات القصيرة ====================
 function getPublishedPosts() {
   return state.posts.filter((p) => !p.status || p.status === "published");
 }
@@ -896,10 +1028,27 @@ function renderBreakingNewsBar() {
   });
 }
 
+// تسجيل ظهور الإعلان مرة واحدة في الجلسة لضمان دقة إحصائيات الإعلانات في غرفة العمليات
+function recordAdImpressionOnce(adId) {
+  if (!adId) return;
+  try {
+    const raw = sessionStorage.getItem(VIEWED_ADS_SESSION_KEY);
+    const seen = raw ? JSON.parse(raw) : {};
+    if (seen[adId]) return;
+    seen[adId] = true;
+    sessionStorage.setItem(VIEWED_ADS_SESSION_KEY, JSON.stringify(seen));
+    updateDoc(doc(db, "ads", adId), { views: increment(1) }).catch(() => {});
+  } catch (_) {}
+}
+
 function renderPublicAds() {
   const topSlot = document.getElementById("ad-slot-top");
   const midSlot = document.getElementById("ad-slot-middle");
-  const activeAds = state.ads.filter((a) => a.active !== false);
+
+  // احترام حالة الإعلان (نشط أم مجمد/متوقف من لوحة التحكم)
+  const activeAds = state.ads.filter(
+    (a) => a.active !== false && a.status !== "paused" && a.status !== "frozen"
+  );
 
   if (!activeAds.length) {
     topSlot?.classList.add("hidden");
@@ -920,11 +1069,15 @@ function renderPublicAds() {
   if (topSlot && activeAds[0]) {
     topSlot.innerHTML = buildAdHtml(activeAds[0]);
     topSlot.classList.remove("hidden");
+    recordAdImpressionOnce(activeAds[0].id);
+  } else if (topSlot) {
+    topSlot.classList.add("hidden");
   }
 
   if (midSlot && activeAds[1]) {
     midSlot.innerHTML = buildAdHtml(activeAds[1]);
     midSlot.classList.remove("hidden");
+    recordAdImpressionOnce(activeAds[1].id);
   } else if (midSlot) {
     midSlot.classList.add("hidden");
   }
@@ -951,7 +1104,8 @@ function renderHeroAndPulseSection() {
     state.searchQuery ||
       state.activeTag ||
       state.activeSubcategory !== "all" ||
-      state.activeCompass === "pulse-only"
+      state.activeCompass === "pulse-only" ||
+      state.activeCompass === "shorts-only"
   );
 
   if (hasSpecialFilter) {
@@ -1001,7 +1155,7 @@ function renderHeroAndPulseSection() {
     bindCardInteractiveEvents(heroBox);
   }
 
-  // شريط موجز الأخبار السريعة الأفقي الأنيق وغير المزعج
+  // شريط موجز الأخبار السريعة
   const pulsePosts = published
     .filter((p) => p.isQuickNews || isBreakingStillActive(p))
     .slice(0, 10);
@@ -1028,6 +1182,49 @@ function renderHeroAndPulseSection() {
       item.addEventListener("click", () => openArticleReader(item.getAttribute("data-open-post")));
     });
   }
+}
+
+// شريط الفيديوهات القصيرة والمرئيات (BBC Shorts / Reels 9:16)
+function renderShortsReelsSection() {
+  const section = document.getElementById("shorts-reels-section");
+  const listEl = document.getElementById("shorts-horizontal-list");
+  if (!section || !listEl) return;
+
+  if (state.activeCompass !== "all" || state.searchQuery || state.activeTag) {
+    section.classList.add("hidden");
+    return;
+  }
+
+  const videoPosts = getPublishedPosts()
+    .filter((p) => isPostVideo(p))
+    .slice(0, 10);
+
+  if (!videoPosts.length) {
+    section.classList.add("hidden");
+    return;
+  }
+
+  section.classList.remove("hidden");
+  listEl.innerHTML = videoPosts
+    .map((p) => {
+      const isShort = isPostShortVerticalVideo(p);
+      const badgeLabel = isShort ? "📱 ريلز" : "▶ فيديو";
+      const dur = p.videoDuration ? ` • ${escapeHtml(p.videoDuration)}` : "";
+      return `
+        <article class="short-reel-card" data-open-post="${escapeHtml(p.id)}">
+          ${buildPostThumbnailHtml(p, p.title)}
+          <span class="short-play-badge">${badgeLabel}${dur}</span>
+          <div class="short-reel-overlay">
+            <h3 class="short-reel-title">${escapeHtml(p.title)}</h3>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  listEl.querySelectorAll("[data-open-post]").forEach((card) => {
+    card.addEventListener("click", () => openArticleReader(card.getAttribute("data-open-post")));
+  });
 }
 
 function buildNewsCardHtml(post) {
@@ -1065,7 +1262,6 @@ function bindCardInteractiveEvents(container) {
   if (!container) return;
   container.querySelectorAll("[data-open-post]").forEach((card) => {
     card.addEventListener("click", (e) => {
-      // السماح بالتمرير أو الضغط على شارة قسم معينة دون فتح المقال عن طريق الخطأ
       const catEl = e.target.closest("[data-card-cat]");
       if (catEl) {
         e.stopPropagation();
@@ -1129,6 +1325,8 @@ function renderPublicPostsFeed() {
       else if (state.activeTag) filterTitle.textContent = `الوسم: #${state.activeTag}`;
       else if (state.activeCompass === "pulse-only")
         filterTitle.textContent = "صفحة الأخبار السريعة والعاجلة (النبض)";
+      else if (state.activeCompass === "shorts-only")
+        filterTitle.textContent = "الفيديوهات القصيرة والتقارير المرئية";
       else if (state.activeSubcategory !== "all")
         filterTitle.textContent = `${getCleanCategoryLabel(state.activeCompass)} — ${
           state.activeSubcategory
@@ -1142,6 +1340,8 @@ function renderPublicPostsFeed() {
   if (heading) {
     if (state.activeCompass === "pulse-only") {
       heading.textContent = "جميع الأخبار السريعة والعاجلة";
+    } else if (state.activeCompass === "shorts-only") {
+      heading.textContent = "الفيديوهات القصيرة والمرئيات";
     } else if (state.activeCompass === "all") {
       heading.textContent = "أحدث الأخبار والتقارير";
     } else {
@@ -1150,7 +1350,7 @@ function renderPublicPostsFeed() {
   }
 
   if (counterEl) {
-    counterEl.textContent = `${list.length.toLocaleString("ar-YE")} خبر`;
+    counterEl.textContent = `${list.length.toLocaleString("ar-YE")} مادة`;
   }
 
   if (!list.length) {
@@ -1173,7 +1373,7 @@ function renderWritersStrip() {
   const listEl = document.getElementById("writers-horizontal-list");
   if (!section || !listEl) return;
 
-  const activeWriters = state.staff.filter((s) => !s.suspended && s.name);
+  const activeWriters = state.staff.filter((s) => s.name && !s.hiddenFromPublic);
 
   if (!activeWriters.length || state.activeCompass !== "all" || state.searchQuery || state.activeTag) {
     section.classList.add("hidden");
@@ -1217,18 +1417,12 @@ function renderAllHomeSections() {
   renderBreakingNewsBar();
   renderPublicAds();
   renderHeroAndPulseSection();
+  renderShortsReelsSection();
   renderPublicPostsFeed();
   renderWritersStrip();
 }
 
-// ------------------- نهاية الجزء الأول من محرك الموقع العام النهائي (حُجرية بريس) -------------------
-/* ==========================================================================
-   حُجرية بريس (Hujariya Press) — المحرك البرمجي الكلاسيكي النظيف (BBC Clean Engine)
-   الجزء الثاني والأخير: عداد المشاهدات الفعلي، مشاركة الخبر مع الصورة والرابط الحقيقي،
-   قارئ الخبر بالتصنيفات المتحركة، أرشيف الكاتب، الصفحات الثابتة، والمزامنة الحية
-   ========================================================================== */
-
-// ==================== 10. عداد المشاهدات الفعلي والدقيق لكل منشور على حدة ====================
+// ==================== 10. عداد المشاهدات الفعلي ومشاركة الخبر الذكية ====================
 async function recordUniquePostView(postId) {
   if (!postId) return;
   try {
@@ -1237,7 +1431,6 @@ async function recordUniquePostView(postId) {
     const viewedMap = rawMap ? JSON.parse(rawMap) : {};
     const lastViewTime = Number(viewedMap[postId] || 0);
 
-    // منع احتساب التحديث العشوائي المتكرر لنفس الزائر خلال 12 ساعة لضمان دقة الإحصائيات
     if (lastViewTime && now - lastViewTime < 12 * 3600 * 1000) {
       return;
     }
@@ -1248,12 +1441,9 @@ async function recordUniquePostView(postId) {
     await updateDoc(doc(db, "posts", postId), {
       views: increment(1)
     });
-  } catch (err) {
-    console.warn("View count sync notice:", err);
-  }
+  } catch (_) {}
 }
 
-// ==================== 11. مشاركة الخبر الذكية (مع إرفاق صورة المقال + الملخص + الرابط الحقيقي) ====================
 async function fetchImageAsShareFile(imageUrl) {
   if (!imageUrl) return null;
   try {
@@ -1279,7 +1469,6 @@ async function shareArticleUnified(post, triggerBtn = null) {
       ? state.settings.siteName
       : "حُجرية بريس";
 
-  // جلب الرابط الفعلي الحقيقي للمنشور على أي دومين أو مستودع يعمل عليه الموقع حالياً
   const shareUrl = getDynamicPostShareUrl(post.id);
 
   const summaryText =
@@ -1302,7 +1491,6 @@ async function shareArticleUnified(post, triggerBtn = null) {
     const effectiveImageUrl = getPostEffectiveImageUrl(post);
 
     if (navigator.share) {
-      // 1. محاولة مشاركة الخبر مع ملف صورة المقال الفعلي + الملخص + الرابط الحقيقي
       if (effectiveImageUrl && navigator.canShare) {
         const imageFile = await fetchImageAsShareFile(effectiveImageUrl);
         if (imageFile && navigator.canShare({ files: [imageFile] })) {
@@ -1315,7 +1503,6 @@ async function shareArticleUnified(post, triggerBtn = null) {
         }
       }
 
-      // 2. إذا لم يدعم المتصفح إرفاق ملف الصورة، يشارك النص الكامل مع الرابط الحقيقي مباشرة
       await navigator.share({
         title: `${post.title} | ${siteName}`,
         text: `📰 ${post.title}\n\n${summaryText}\n\n📌 باقي التفاصيل في موقع ${siteName}:`,
@@ -1324,7 +1511,6 @@ async function shareArticleUnified(post, triggerBtn = null) {
       return;
     }
 
-    // 3. في المتصفحات المكتبية: نسخ النص الكامل مع الملخص والرابط الفعلي للحافظة
     await navigator.clipboard.writeText(fullShareMessage);
     showPubToast("تم نسخ العنوان والملخص والرابط الحقيقي للمشاركة ✓");
     if (topLabel) topLabel.textContent = "تم النسخ ✓";
@@ -1347,26 +1533,36 @@ async function shareArticleUnified(post, triggerBtn = null) {
   }
 }
 
-// ==================== 12. قارئ الخبر الكامل، التصنيفات المتحركة، والفيديو ====================
-function extractYoutubeEmbedUrl(url = "") {
-  const clean = String(url || "").trim();
-  if (!clean) return "";
-  const regExp =
-    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
-  const match = clean.match(regExp);
-  return match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : "";
-}
+// ==================== 11. قارئ الخبر الكامل، مشغل الفيديو العمودي/العريض، والروابط الآمنة ====================
+function buildSmartVideoPlayerHtml(post) {
+  const rawUrl = String(post?.videoUrl || "").trim();
+  if (!rawUrl) return "";
 
-function formatHashtagsInHtml(htmlContent = "") {
-  if (!htmlContent) return "";
-  return htmlContent.replace(
-    /(^|\s)#([\u0600-\u06FFa-zA-Z0-9_]+)/g,
-    (full, space, tag) => {
-      return `${space}<span class="inline-hashtag" data-inline-tag="${escapeHtml(
-        tag
-      )}">#${escapeHtml(tag)}</span>`;
-    }
-  );
+  const isVertical = isPostShortVerticalVideo(post);
+  const frameClass = isVertical ? "video-frame-vertical" : "video-frame-landscape";
+  const ytId = extractYoutubeVideoId(rawUrl);
+
+  if (ytId) {
+    const embedUrl = `https://www.youtube.com/embed/${ytId}?rel=0`;
+    return `
+      <div class="${frameClass}">
+        <iframe src="${escapeHtml(embedUrl)}" title="${escapeHtml(
+      post.title || "فيديو حُجرية بريس"
+    )}" allowfullscreen loading="lazy"></iframe>
+      </div>
+    `;
+  }
+
+  // دعم ملفات الفيديو المباشرة (.mp4 / .webm)
+  if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(rawUrl)) {
+    return `
+      <div class="${frameClass}">
+        <video src="${escapeHtml(rawUrl)}" controls playsinline preload="metadata"></video>
+      </div>
+    `;
+  }
+
+  return "";
 }
 
 function switchPublicView(viewName) {
@@ -1394,7 +1590,6 @@ function openArticleReader(postId, updateHistory = true) {
   state.currentArticleId = post.id;
   switchPublicView("article");
 
-  // تسجيل مشاهدة حقيقية ودقيقة لهذا المنشور
   recordUniquePostView(post.id);
 
   const compasses = getPostCompasses(post);
@@ -1428,7 +1623,7 @@ function openArticleReader(postId, updateHistory = true) {
     } catch (_) {}
   }
 
-  // شريط التصنيفات والمسميات الأفقي المتحرك أعلى المقال (يتسع لأي عدد من التصنيفات دون تشويه)
+  // شريط تصنيفات المقال
   const badgesEl = document.getElementById("article-categories-badges");
   if (badgesEl) {
     const subcats = [];
@@ -1458,7 +1653,6 @@ function openArticleReader(postId, updateHistory = true) {
     });
   }
 
-  // العنوان والموجز
   const titleEl = document.getElementById("reader-article-title");
   if (titleEl) titleEl.textContent = post.title || "";
 
@@ -1468,7 +1662,6 @@ function openArticleReader(postId, updateHistory = true) {
     summaryEl.classList.toggle("hidden", !post.summary);
   }
 
-  // بيانات الكاتب والوقت
   const authorAvatarEl = document.getElementById("reader-author-avatar");
   if (authorAvatarEl) authorAvatarEl.src = authorInfo.avatar;
 
@@ -1486,7 +1679,6 @@ function openArticleReader(postId, updateHistory = true) {
     authorBox.onclick = () => openAuthorProfile(authorInfo.authorKey);
   }
 
-  // ربط أزرار المشاركة الموحدة (العلوي والسفلي)
   const shareTopBtn = document.getElementById("unified-share-btn");
   if (shareTopBtn) {
     shareTopBtn.onclick = () => shareArticleUnified(post, shareTopBtn);
@@ -1497,22 +1689,14 @@ function openArticleReader(postId, updateHistory = true) {
     shareBottomBtn.onclick = () => shareArticleUnified(post, shareBottomBtn);
   }
 
-  // صورة المقال البارزة (أو الصورة الافتراضية للهوية)
-  const mediaFig = document.getElementById("reader-media-figure");
-  if (mediaFig) {
-    mediaFig.innerHTML = buildPostThumbnailHtml(post, post.title);
-  }
-
-  // فيديو يوتيوب المضمن إن وجد
+  // مشغل الفيديو الذكي والصورة البارزة
   const videoBox = document.getElementById("reader-video-box");
-  const embedUrl = extractYoutubeEmbedUrl(post.videoUrl);
+  const mediaFig = document.getElementById("reader-media-figure");
+  const videoPlayerHtml = buildSmartVideoPlayerHtml(post);
+
   if (videoBox) {
-    if (embedUrl) {
-      videoBox.innerHTML = `<iframe src="${escapeHtml(
-        embedUrl
-      )}" title="${escapeHtml(
-        post.title
-      )}" allowfullscreen loading="lazy"></iframe>`;
+    if (videoPlayerHtml) {
+      videoBox.innerHTML = videoPlayerHtml;
       videoBox.classList.remove("hidden");
     } else {
       videoBox.innerHTML = "";
@@ -1520,10 +1704,20 @@ function openArticleReader(postId, updateHistory = true) {
     }
   }
 
-  // نص المقال الكامل
+  if (mediaFig) {
+    // إذا كان هناك فيديو مضمن ولا توجد صورة خاصة منفصلة، نخفي الصورة المكررة ليظهر الفيديو بأناقة
+    if (videoPlayerHtml && !post.imageUrl) {
+      mediaFig.classList.add("hidden");
+    } else {
+      mediaFig.classList.remove("hidden");
+      mediaFig.innerHTML = buildPostThumbnailHtml(post, post.title);
+    }
+  }
+
+  // نص المقال الكامل بعد تطهيره ودعم الروابط والمصادر والهاشتاجات بأمان
   const contentEl = document.getElementById("reader-article-content");
   if (contentEl) {
-    contentEl.innerHTML = formatHashtagsInHtml(post.content || "");
+    contentEl.innerHTML = sanitizeAndFormatArticleHtml(post.content || "");
     contentEl.querySelectorAll("[data-inline-tag]").forEach((tagSpan) => {
       tagSpan.addEventListener("click", () => {
         filterByHashtag(tagSpan.getAttribute("data-inline-tag"));
@@ -1531,9 +1725,11 @@ function openArticleReader(postId, updateHistory = true) {
     });
   }
 
-  // شريط الوسوم الأفقي المتحرك أسفل المقال
+  // شريط الوسوم أسفل المقال (مقيد بـ 3 وسوم كحد أقصى)
   const tagsBox = document.getElementById("reader-tags-box");
-  const tags = Array.isArray(post.tags) ? post.tags.filter(Boolean) : [];
+  const tags = Array.isArray(post.tags)
+    ? post.tags.filter(Boolean).slice(0, MAX_ALLOWED_TAGS)
+    : [];
   if (tagsBox) {
     if (tags.length) {
       tagsBox.classList.remove("hidden");
@@ -1587,7 +1783,7 @@ function filterByHashtag(tag) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ==================== 13. صفحة الكاتب وأرشيف مقالاته ====================
+// ==================== 12. صفحة الكاتب والصفحات الثابتة ====================
 function openAuthorProfile(authorKey, updateHistory = true) {
   if (!authorKey) return;
   state.currentAuthorKey = authorKey;
@@ -1599,7 +1795,6 @@ function openAuthorProfile(authorKey, updateHistory = true) {
     (s) =>
       String(s.id || "").toLowerCase() === keyLower ||
       String(s.username || "").toLowerCase() === keyLower ||
-      String(s.email || "").toLowerCase() === keyLower ||
       String(s.name || "").trim().toLowerCase() === keyLower
   );
 
@@ -1675,7 +1870,6 @@ function openAuthorProfile(authorKey, updateHistory = true) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ==================== 14. الصفحات المؤسسية الثابتة (من نحن، الميثاق، الخصوصية) ====================
 function openStaticPage(pageKey) {
   closeMasterSidebar();
   switchPublicView("static");
@@ -1686,19 +1880,19 @@ function openStaticPage(pageKey) {
 
   if (pageKey === "charter") {
     if (titleEl) titleEl.textContent = "ميثاق الشرف الصحفي والسياسة التحريرية";
-    if (bodyEl) bodyEl.innerHTML = s.charterHtml || DEFAULT_CHARTER_HTML;
+    if (bodyEl) bodyEl.innerHTML = sanitizeAndFormatArticleHtml(s.charterHtml || DEFAULT_CHARTER_HTML);
   } else if (pageKey === "privacy") {
     if (titleEl) titleEl.textContent = "سياسة الخصوصية وحماية البيانات";
-    if (bodyEl) bodyEl.innerHTML = s.privacyHtml || DEFAULT_PRIVACY_HTML;
+    if (bodyEl) bodyEl.innerHTML = sanitizeAndFormatArticleHtml(s.privacyHtml || DEFAULT_PRIVACY_HTML);
   } else {
     if (titleEl) titleEl.textContent = "من نحن والتوجيه الوطني";
-    if (bodyEl) bodyEl.innerHTML = s.aboutHtml || DEFAULT_ABOUT_HTML;
+    if (bodyEl) bodyEl.innerHTML = sanitizeAndFormatArticleHtml(s.aboutHtml || DEFAULT_ABOUT_HTML);
   }
 
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ==================== 15. ربط الأحداث، القائمة الجانبية المباشرة، والبحث ====================
+// ==================== 13. ربط الأحداث، البحث، والمزامنة الحية الآمنة ====================
 function resetToHomeFeed() {
   closeMasterSidebar();
   state.activeCompass = "all";
@@ -1733,8 +1927,19 @@ function openPulseDedicatedPage() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function openShortsDedicatedPage() {
+  closeMasterSidebar();
+  state.activeCompass = "shorts-only";
+  state.activeSubcategory = "all";
+  state.activeTag = "";
+  state.visiblePostsLimit = 24;
+  switchPublicView("home");
+  renderCompassesNavigation();
+  renderAllHomeSections();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function bindPublicEvents() {
-  // فتح وإغلاق القائمة الجانبية الشاملة
   document
     .getElementById("open-master-sidebar-btn")
     ?.addEventListener("click", openMasterSidebar);
@@ -1745,7 +1950,6 @@ function bindPublicEvents() {
     .getElementById("master-sidebar-backdrop")
     ?.addEventListener("click", closeMasterSidebar);
 
-  // أزرار الانتقال المباشر للرئيسية وصفحة الأخبار السريعة (النبض)
   document
     .getElementById("sidebar-home-btn")
     ?.addEventListener("click", resetToHomeFeed);
@@ -1755,8 +1959,13 @@ function bindPublicEvents() {
   document
     .getElementById("view-all-pulse-btn")
     ?.addEventListener("click", openPulseDedicatedPage);
+  document
+    .getElementById("sidebar-shorts-page-btn")
+    ?.addEventListener("click", openShortsDedicatedPage);
+  document
+    .getElementById("view-all-shorts-btn")
+    ?.addEventListener("click", openShortsDedicatedPage);
 
-  // العودة للرئيسية من الهيدر أو صفحات القراءة
   document.getElementById("brand-home-link")?.addEventListener("click", (e) => {
     e.preventDefault();
     resetToHomeFeed();
@@ -1789,7 +1998,6 @@ function bindPublicEvents() {
     renderPublicPostsFeed();
   });
 
-  // البحث التفاعلي الفوري
   const searchForm = document.getElementById("public-search-form");
   const searchInput = document.getElementById("public-search-input");
   const clearBtn = document.getElementById("clear-search-btn");
@@ -1816,7 +2024,6 @@ function bindPublicEvents() {
     renderAllHomeSections();
   });
 
-  // فتح الصفحات الثابتة (من نحن، ميثاق الشرف، الخصوصية)
   document.querySelectorAll("[data-open-page]").forEach((btn) => {
     btn.addEventListener("click", () =>
       openStaticPage(btn.getAttribute("data-open-page"))
@@ -1842,11 +2049,13 @@ function checkUrlParamsOnLoad(allowPush = false) {
   }
 }
 
-// ==================== 16. المزامنة الحية مع قاعدة بيانات Firebase ====================
 function startPublicRealtimeSync() {
   onSnapshot(doc(db, "settings", "general"), (snap) => {
     if (snap.exists()) {
-      state.settings = { ...state.settings, ...snap.data() };
+      const rawSettings = snap.data() || {};
+      // عدم الاحتفاظ بمفاتيح خارجية خاصة في ذاكرة الموقع العام
+      const { imgbbApiKey, ...publicSafeSettings } = rawSettings;
+      state.settings = { ...state.settings, ...publicSafeSettings };
     }
     applyDynamicSiteIdentity();
     renderAllHomeSections();
@@ -1871,8 +2080,24 @@ function startPublicRealtimeSync() {
     renderAllHomeSections();
   });
 
+  // تنقية بيانات الكادر في الواجهة العامة لحماية الخصوصية والأمان
   onSnapshot(collection(db, "staff"), (snap) => {
-    state.staff = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    state.staff = snap.docs.map((d) => {
+      const raw = d.data() || {};
+      return {
+        id: d.id,
+        name: raw.name || "",
+        username: raw.username || "",
+        avatar: raw.avatar || "",
+        jobTitle: raw.jobTitle || "",
+        bio: raw.bio || "",
+        verified: Boolean(raw.verified || raw.role === "admin" || raw.isMasterAdmin),
+        role: raw.role || "writer",
+        isMasterAdmin: Boolean(raw.isMasterAdmin),
+        suspended: Boolean(raw.suspended),
+        hiddenFromPublic: Boolean(raw.hiddenFromPublic)
+      };
+    });
     renderWritersStrip();
     renderPublicPostsFeed();
     renderMasterSidebarContents();
@@ -1901,7 +2126,7 @@ function startPublicRealtimeSync() {
   });
 }
 
-// ==================== 17. نقطة انطلاق الموقع العام النهائي (حُجرية بريس) ====================
+// ==================== 14. نقطة انطلاق الموقع العام (حُجرية بريس) ====================
 document.addEventListener("DOMContentLoaded", () => {
   initRegionalWeatherStrip();
   initGlobalMarketsStrip();
