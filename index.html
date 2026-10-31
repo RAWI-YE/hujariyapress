@@ -7,23 +7,23 @@
   <meta name="description" id="page-meta-desc" content="حُجرية بريس — منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.">
   <meta name="theme-color" content="#ef3327" id="page-theme-color">
 
-  <!-- إعدادات تطبيق الويب (الإضافة إلى الشاشة الرئيسية) والأيقونات الديناميكية من الإعدادات -->
+  <!-- إعدادات تثبيت تطبيق الويب (PWA) والأيقونات الديناميكية من الإعدادات -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="حُجرية بريس">
   <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ef3327%22/><text x=%2250%%22 y=%2258%%22 font-size=%2264%22 fill=%22%23ffffff%22 font-family=%22Cairo,sans-serif%22 font-weight=%22900%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>ح</text></svg>">
   <link rel="apple-touch-icon" id="dynamic-apple-icon" href="">
 
-  <!-- وسوم المشاركة الذكية (تظهر صورة المقال وعنوانه وملخصه عند المشاركة) -->
+  <!-- وسوم المشاركة الذكية (Open Graph) -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="حُجرية بريس | Hujariya Press">
   <meta property="og:title" id="og-meta-title" content="حُجرية بريس | Hujariya Press">
   <meta property="og:description" id="og-meta-desc" content="منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.">
   <meta property="og:image" id="og-meta-image" content="">
-  <meta property="og:url" id="og-meta-url" content="https://hujariyapress.rawi-ye.com">
+  <meta property="og:url" id="og-meta-url" content="">
   <meta name="twitter:card" content="summary_large_image">
 
-  <!-- الخطوط العربية الرصينة ومكتبة الأيقونات الاحترافية -->
+  <!-- الخطوط العربية الرسمية ومكتبة الأيقونات العالمية Google Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -35,49 +35,48 @@
 <body>
 
   <!-- =====================================================================
-       1. شريط طقس المدن اليمنية النحيف جداً (أعلى الصفحة بهدوء وأناقة)
+       1. شريط الطقس العلوي النحيف (كافة المدن اليمنية + المدن السعودية المهمة)
        ===================================================================== -->
-  <div class="weather-top-strip" aria-label="طقس المدن اليمنية">
+  <div class="weather-top-strip" aria-label="حالة الطقس في اليمن والمملكة">
     <div class="pub-container weather-strip-inner">
-      <div class="weather-strip-label">
+      <div class="weather-strip-badge">
         <span class="material-symbols-rounded" translate="no">partly_cloudy_day</span>
-        <span>طقس اليمن:</span>
+        <span>الطقس:</span>
       </div>
-      <div class="weather-ticker-viewport">
-        <div id="yemen-weather-track" class="weather-ticker-track">
-          <span>صنعاء 24°C</span>
-          <span class="w-sep">•</span>
-          <span>عدن 31°C</span>
-          <span class="w-sep">•</span>
-          <span>تعز 26°C</span>
-          <span class="w-sep">•</span>
-          <span>المكلا 29°C</span>
-          <span class="w-sep">•</span>
-          <span>مأرب 28°C</span>
+      <div class="ticker-viewport">
+        <div id="regional-weather-track" class="continuous-ticker-track weather-speed">
+          <span>صنعاء 24°C</span><span class="t-sep">•</span>
+          <span>عدن 31°C</span><span class="t-sep">•</span>
+          <span>تعز 26°C</span><span class="t-sep">•</span>
+          <span>المكلا 29°C</span><span class="t-sep">•</span>
+          <span>مأرب 28°C</span><span class="t-sep">•</span>
+          <span>الرياض 30°C</span><span class="t-sep">•</span>
+          <span>مكة المكرمة 33°C</span><span class="t-sep">•</span>
+          <span>جدة 31°C</span>
         </div>
       </div>
     </div>
   </div>
 
   <!-- =====================================================================
-       2. الهيدر الرئيسي النظيف (القائمة الجانبية + الشعار/الاسم + البحث)
+       2. الهيدر الكلاسيكي النظيف باللون الأحمر الفاتح (القائمة + الشعار + البحث)
        ===================================================================== -->
   <header class="bbc-clean-header" id="site-header-banner">
     <div class="pub-container header-main-row">
 
-      <!-- يمين الهيدر: زر فتح القائمة الجانبية الشاملة -->
+      <!-- يمين الهيدر: زر القائمة الجانبية الشاملة -->
       <button type="button" id="open-master-sidebar-btn" class="header-menu-btn" aria-label="فتح القائمة الجانبية">
         <span class="material-symbols-rounded" translate="no">menu</span>
         <span class="menu-btn-label">القائمة</span>
       </button>
 
-      <!-- وسط الهيدر: مكان الشعار أو الاسم النصي النظيف (يتبدل من الإعدادات بضغطة زر) -->
+      <!-- وسط الهيدر: مكان الشعار أو الاسم النصي (يُدار بالكامل من الإعدادات) -->
       <a href="#home" id="brand-home-link" class="header-brand-slot" aria-label="حُجرية بريس - الصفحة الرئيسية">
         <img id="site-logo-img" src="" alt="حُجرية بريس" class="header-logo-img hidden">
         <span id="site-text-brand" class="header-brand-text">حُجرية بريس</span>
       </a>
 
-      <!-- يسار الهيدر: حقل البحث المدمج الأنيق -->
+      <!-- يسار الهيدر: شريط البحث المدمج -->
       <form id="public-search-form" class="header-search-form" role="search">
         <span class="material-symbols-rounded search-icon" translate="no">search</span>
         <input type="search" id="public-search-input" placeholder="ابحث في الأخبار..." aria-label="ابحث في الأخبار">
@@ -90,7 +89,30 @@
   </header>
 
   <!-- =====================================================================
-       3. شريط الأقسام الكلاسيكي النظيف (BBC Horizontal Navigation)
+       3. شريط مؤشرات الأسواق العالمية والعملات والطاقة (تحت الهيدر مباشرة)
+       ===================================================================== -->
+  <div class="markets- strip-bar" aria-label="مؤشرات الأسواق العالمية والعملات">
+    <div class="pub-container markets-strip-inner">
+      <div class="markets-strip-badge">
+        <span class="material-symbols-rounded" translate="no">monitoring</span>
+        <span>الأسواق:</span>
+      </div>
+      <div class="ticker-viewport">
+        <div id="global-markets-track" class="continuous-ticker-track markets-speed">
+          <span class="m-item">الذهب <strong dir="ltr">$2,745.40</strong> <em class="m-up">▲ +0.4%</em></span>
+          <span class="t-sep">|</span>
+          <span class="m-item">نفط برنت <strong dir="ltr">$74.80</strong> <em class="m-up">▲ +0.8%</em></span>
+          <span class="t-sep">|</span>
+          <span class="m-item">تاسي السعودي <strong dir="ltr">12,045</strong> <em class="m-up">▲ +0.3%</em></span>
+          <span class="t-sep">|</span>
+          <span class="m-item">داو جونز <strong dir="ltr">42,380</strong> <em class="m-up">▲ +0.2%</em></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       4. شريط الأقسام الكلاسيكي النظيف (BBC Horizontal Tabs)
        ===================================================================== -->
   <nav class="bbc-categories-bar" aria-label="أقسام الموقع">
     <div class="pub-container">
@@ -100,7 +122,7 @@
     </div>
   </nav>
 
-  <!-- شريط الفئات الفرعية (يظهر فقط عند الدخول لقسم يحتوي على فئات فرعية) -->
+  <!-- شريط التصنيفات الفرعية (يظهر عند اختيار قسم معين) -->
   <div id="subcategories-bar-wrap" class="subcategories-bar-wrap hidden">
     <div class="pub-container">
       <div id="public-subcategories-list" class="subcategories-scroll-row"></div>
@@ -108,7 +130,7 @@
   </div>
 
   <!-- =====================================================================
-       4. شريط الأخبار العاجلة التلفزيوني المتحرك (يمر بلا نهاية ولا يضخم الصفحة)
+       5. شريط الأخبار العاجلة التلفزيوني المتحرك (يمر بلا نهاية ولا يضخم الصفحة)
        ===================================================================== -->
   <section id="breaking-news-bar" class="tv-breaking-bar hidden" aria-label="أخبار عاجلة">
     <div class="pub-container tv-breaking-inner">
@@ -116,149 +138,134 @@
         <span class="pulse-dot"></span>
         <strong>عاجل</strong>
       </div>
-      <div class="tv-ticker-viewport">
-        <div id="breaking-ticker-items" class="tv-ticker-track"></div>
+      <div class="ticker-viewport">
+        <div id="breaking-ticker-items" class="continuous-ticker-track breaking-speed"></div>
       </div>
     </div>
   </section>
 
   <!-- =====================================================================
-       5. القائمة الجانبية الشاملة (تجمع كل شيء بنظام متداخل أنيق "شيء داخل شيء")
+       6. القائمة الجانبية الشاملة (تفتح صفحات الأقسام مباشرة بضغطة واحدة)
        ===================================================================== -->
   <div id="master-sidebar-backdrop" class="sidebar-backdrop hidden"></div>
   <aside id="master-sidebar-drawer" class="master-sidebar-drawer hidden" aria-label="القائمة الجانبية الشاملة">
     <div class="sidebar-drawer-header">
-      <strong id="sidebar-brand-title" class="sidebar-brand-title">حُجرية بريس</strong>
+      <div class="sidebar-header-brand">
+        <img id="sidebar-logo-img" src="" alt="" class="sidebar-logo-img hidden">
+        <strong id="sidebar-brand-title" class="sidebar-brand-title">حُجرية بريس</strong>
+      </div>
       <button type="button" id="close-master-sidebar-btn" class="sidebar-close-btn" aria-label="إغلاق القائمة">
         <span class="material-symbols-rounded" translate="no">close</span>
       </button>
     </div>
 
     <div class="sidebar-drawer-body">
-      <!-- زر العودة السريعة للرئيسية -->
-      <button type="button" id="sidebar-home-btn" class="sidebar-direct-link">
-        <span class="material-symbols-rounded" translate="no">home</span>
-        <span>الصفحة الرئيسية</span>
-      </button>
-
-      <!-- قسم متداخل 1: الأقسام والفئات الفرعية (شيء داخل شيء) -->
-      <div class="sidebar-accordion-group">
-        <button type="button" class="sidebar-accordion-toggle open" data-acc-target="acc-categories">
-          <div class="acc-title-wrap">
-            <span class="material-symbols-rounded" translate="no">newspaper</span>
-            <span>الأقسام والتغطيات</span>
-          </div>
-          <span class="material-symbols-rounded acc-arrow" translate="no">expand_more</span>
+      <!-- انتقال مباشر للرئيسية والنبض السريع -->
+      <div class="sidebar-section-block">
+        <button type="button" id="sidebar-home-btn" class="sidebar-page-link active">
+          <span class="material-symbols-rounded" translate="no">home</span>
+          <span>الصفحة الرئيسية</span>
         </button>
-        <div id="acc-categories" class="sidebar-accordion-content">
-          <div id="sidebar-categories-tree" class="sidebar-tree-list"></div>
+        <button type="button" id="sidebar-pulse-page-btn" class="sidebar-page-link">
+          <span class="material-symbols-rounded" translate="no">bolt</span>
+          <span>صفحة الأخبار السريعة (النبض)</span>
+        </button>
+      </div>
+
+      <!-- أقسام الموقع: الضغط على أي قسم يفتح صفحته مباشرة -->
+      <div class="sidebar-section-block">
+        <span class="sidebar-block-title">أقسام حُجرية بريس</span>
+        <div id="sidebar-categories-direct-list" class="sidebar-direct-grid"></div>
+      </div>
+
+      <!-- زاوية الكُتّاب ومقالات الرأي -->
+      <div id="sidebar-writers-block" class="sidebar-section-block hidden">
+        <span class="sidebar-block-title">أقلام وكُتّاب المنصة</span>
+        <div id="sidebar-writers-list" class="sidebar-writers-list"></div>
+      </div>
+
+      <!-- الصفحات المؤسسية الثابتة -->
+      <div class="sidebar-section-block">
+        <span class="sidebar-block-title">عن المنصة والمواثيق</span>
+        <div class="sidebar-pages-list">
+          <button type="button" class="sidebar-page-link" data-open-page="about">
+            <span class="material-symbols-rounded" translate="no">info</span>
+            <span>من نحن والتوجيه الوطني</span>
+          </button>
+          <button type="button" class="sidebar-page-link" data-open-page="charter">
+            <span class="material-symbols-rounded" translate="no">gavel</span>
+            <span>ميثاق الشرف الصحفي</span>
+          </button>
+          <button type="button" class="sidebar-page-link" data-open-page="privacy">
+            <span class="material-symbols-rounded" translate="no">verified_user</span>
+            <span>سياسة الخصوصية</span>
+          </button>
         </div>
       </div>
 
-      <!-- قسم متداخل 2: النبض الإخباري السريع -->
-      <div class="sidebar-accordion-group">
-        <button type="button" class="sidebar-accordion-toggle" data-acc-target="acc-pulse">
-          <div class="acc-title-wrap">
-            <span class="material-symbols-rounded" translate="no">bolt</span>
-            <span>النبض الإخباري السريع</span>
-          </div>
-          <span class="material-symbols-rounded acc-arrow" translate="no">expand_more</span>
-        </button>
-        <div id="acc-pulse" class="sidebar-accordion-content hidden">
-          <div id="sidebar-pulse-list" class="sidebar-pulse-list"></div>
-        </div>
-      </div>
-
-      <!-- قسم متداخل 3: كُتّاب وأقلام المنصة -->
-      <div class="sidebar-accordion-group">
-        <button type="button" class="sidebar-accordion-toggle" data-acc-target="acc-writers">
-          <div class="acc-title-wrap">
-            <span class="material-symbols-rounded" translate="no">ink_pen</span>
-            <span>كُتّاب وأقلام حُجرية بريس</span>
-          </div>
-          <span class="material-symbols-rounded acc-arrow" translate="no">expand_more</span>
-        </button>
-        <div id="acc-writers" class="sidebar-accordion-content hidden">
-          <div id="sidebar-writers-list" class="sidebar-writers-list"></div>
-        </div>
-      </div>
-
-      <!-- قسم متداخل 4: عن المنصة والمواثيق المؤسسية -->
-      <div class="sidebar-accordion-group">
-        <button type="button" class="sidebar-accordion-toggle" data-acc-target="acc-pages">
-          <div class="acc-title-wrap">
-            <span class="material-symbols-rounded" translate="no">policy</span>
-            <span>عن المنصة والميثاق</span>
-          </div>
-          <span class="material-symbols-rounded acc-arrow" translate="no">expand_more</span>
-        </button>
-        <div id="acc-pages" class="sidebar-accordion-content hidden">
-          <div class="sidebar-sub-links">
-            <button type="button" class="sidebar-sub-btn" data-open-page="about">من نحن والتوجيه الوطني</button>
-            <button type="button" class="sidebar-sub-btn" data-open-page="charter">ميثاق الشرف الصحفي</button>
-            <button type="button" class="sidebar-sub-btn" data-open-page="privacy">سياسة الخصوصية</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- منصات التواصل الاجتماعي داخل القائمة الجانبية -->
-      <div id="sidebar-socials-wrap" class="sidebar-socials-section hidden">
-        <span class="sidebar-section-label">تابعنا عبر منصات التواصل</span>
+      <!-- منصات التواصل الاجتماعي (تظهر فقط المنصات المضاف لها رابط في الإعدادات) -->
+      <div id="sidebar-socials-wrap" class="sidebar-section-block hidden">
+        <span class="sidebar-block-title">تابعنا على منصات التواصل</span>
         <div id="sidebar-social-links" class="sidebar-socials-grid"></div>
       </div>
     </div>
 
     <div class="sidebar-drawer-footer">
       <span>مؤسسة <strong>RAWI-YE.COM</strong> الإعلامية</span>
-      <span dir="ltr">hujariyapress.rawi-ye.com</span>
+      <span id="sidebar-domain-label" dir="ltr">hujariyapress.rawi-ye.com</span>
     </div>
   </aside>
 
   <!-- =====================================================================
-       6. مساحة الأخبار الرئيسية (واجهة قراءة نظيفة، سريعة، ومرتبة بالمسطرة)
+       7. مساحة المحتوى الإخباري الرئيسية (واجهة BBC الكلاسيكية النظيفة)
        ===================================================================== -->
   <main class="pub-container main-workspace">
 
-    <!-- المساحة الإعلانية العلوية (تظهر فقط إن وُجد إعلان مفعّل) -->
+    <!-- المساحة الإعلانية العلوية (تظهر فقط عند تفعيل إعلان) -->
     <div id="ad-slot-top" class="ad-slot-container hidden"></div>
 
-    <!-- شريط تنبيه التصفية النشطة (عند البحث أو اختيار وسم) -->
+    <!-- شريط عنوان القسم أو الفلتر المفتوح حالياً -->
     <div id="active-filter-banner" class="active-filter-banner hidden">
       <div class="filter-banner-info">
-        <span class="material-symbols-rounded" translate="no">filter_list</span>
+        <span class="bbc-red-mark"></span>
         <strong id="active-filter-title">نتائج العرض</strong>
       </div>
       <button type="button" id="reset-all-filters-btn" class="btn-clean-reset">
-        <span>إلغاء الفلتر وعرض الكل</span>
+        <span class="material-symbols-rounded" translate="no">arrow_forward</span>
+        <span>العودة للرئيسية</span>
       </button>
     </div>
 
     <!-- =================================================================
-         (أ) واجهة الصفحة الرئيسية والأقسام (BBC Clean News Layout)
+         (أ) واجهة الصفحة الرئيسية وصفحات الأقسام
          ================================================================= -->
     <div id="view-home" class="app-view">
 
-      <!-- منطقة الخبر الرئيسي البارز + الموجز السريع -->
-      <section id="hero-and-pulse-section" class="bbc-top-section">
-        <div id="hero-featured-box" class="bbc-lead-story-Slot">
+      <!-- التغطية الرئيسية البارزة (Hero Story) -->
+      <section id="hero-featured-section" class="hero-featured-section">
+        <div id="hero-featured-box" class="bbc-lead-story-slot">
           <div class="skeleton-box hero-skeleton">جاري تحميل الخبر الرئيسي...</div>
         </div>
+      </section>
 
-        <aside class="bbc-side-brief" aria-label="النبض السريع">
-          <div class="bbc-block-header">
-            <span class="bbc-red-mark"></span>
+      <!-- شريط موجز الأخبار السريعة الأنيق والمدمج (مكان هادئ وغير مزعج) -->
+      <section id="quick-pulse-strip-section" class="quick-pulse-strip-section" aria-label="موجز الأخبار السريعة">
+        <div class="pulse-strip-header">
+          <div class="pulse-header-right">
+            <span class="material-symbols-rounded pulse-icon" translate="no">bolt</span>
             <h2>موجز الأخبار السريعة</h2>
           </div>
-          <div id="quick-pulse-feed" class="bbc-brief-list">
-            <div class="empty-state-msg">جاري التحميل...</div>
-          </div>
-        </aside>
+          <button type="button" id="view-all-pulse-btn" class="pulse-more-btn">عرض الكل</button>
+        </div>
+        <div id="quick-pulse-feed" class="pulse-horizontal-cards">
+          <div class="empty-state-msg">جاري تحميل الموجز...</div>
+        </div>
       </section>
 
       <!-- المساحة الإعلانية الوسطى -->
       <div id="ad-slot-middle" class="ad-slot-container hidden"></div>
 
-      <!-- شبكة الأخبار والتقارير المرتبة -->
+      <!-- شبكة الأخبار والتقارير والتحليلات -->
       <section class="bbc-news-section" aria-label="أحدث الأخبار والتقارير">
         <div class="bbc-block-header">
           <span class="bbc-red-mark"></span>
@@ -280,7 +287,7 @@
         </div>
       </section>
 
-      <!-- زاوية الكُتّاب ومقالات الرأي (هادئة ومرتبة أسفل الأخبار) -->
+      <!-- زاوية كُتّاب وأقلام «حُجرية بريس» -->
       <section id="writers-strip-section" class="bbc-writers-section hidden" aria-label="أقلام وكُتّاب حُجرية بريس">
         <div class="bbc-block-header">
           <span class="bbc-red-mark"></span>
@@ -292,7 +299,7 @@
     </div>
 
     <!-- =================================================================
-         (ب) واجهة قراءة الخبر الكامل (نظيفة ومباشرة مع زر مشاركة موحد فقط)
+         (ب) واجهة قراءة الخبر الكامل (مع شريط التصنيفات المتحرك وزر المشاركة الذكي بالصورة)
          ================================================================= -->
     <article id="view-article" class="app-view hidden">
       <div class="article-top-nav">
@@ -300,16 +307,18 @@
           <span class="material-symbols-rounded" translate="no">arrow_forward</span>
           <span>العودة للأخبار</span>
         </button>
-        <div id="article-categories-badges" class="article-cat-tags"></div>
+
+        <!-- شريط تصنيفات المقال الأفقي المتحرك (يتسع لأي عدد من التصنيفات بأناقة) -->
+        <div id="article-categories-badges" class="horizontal-tags-scroll"></div>
       </div>
 
       <div class="bbc-article-sheet">
         <h1 id="reader-article-title" class="article-main-headline"></h1>
 
-        <!-- الزبدة / الملخص الإخباري -->
+        <!-- الملخص الإخباري (الزبدة) -->
         <p id="reader-article-summary" class="article-lead-summary hidden"></p>
 
-        <!-- شريط معلومات الكاتب والوقت + زر المشاركة الموحد فقط -->
+        <!-- شريط معلومات الكاتب والوقت + زر المشاركة الموحد الذي يشارك الصورة والملخص والرابط -->
         <div class="article-byline-bar">
           <div id="reader-author-box" class="byline-author-info" role="button" tabindex="0">
             <img id="reader-author-avatar" src="" alt="" class="byline-avatar">
@@ -322,10 +331,9 @@
             </div>
           </div>
 
-          <!-- زر المشاركة الموحد الذكي (بدون زحمة أيقونات) -->
-          <button type="button" id="unified-share-btn" class="btn-unified-share" title="مشاركة الخبر">
+          <button type="button" id="unified-share-btn" class="btn-unified-share" title="مشاركة الخبر مع الصورة والملخص والرابط">
             <span class="material-symbols-rounded" translate="no">share</span>
-            <span id="unified-share-label">مشاركة الخبر</span>
+            <span id="unified-share-label">مشاركة</span>
           </button>
         </div>
 
@@ -335,23 +343,23 @@
         <!-- فيديو يوتيوب المضمن إن وجد -->
         <div id="reader-video-box" class="article-video-embed hidden"></div>
 
-        <!-- نص الخبر الكامل -->
+        <!-- النص الكامل للخبر -->
         <div id="reader-article-content" class="article-body-prose"></div>
 
-        <!-- شريط مشاركة سفلي موحد لتسهيل المشاركة بعد إنهاء القراءة -->
+        <!-- شريط مشاركة سفلي موحد -->
         <div class="article-bottom-share">
-          <span>هل أعجبك التقرير؟ شاركه مع الآخرين:</span>
+          <span>شارك هذا الخبر مع الآخرين:</span>
           <button type="button" id="unified-share-bottom-btn" class="btn-unified-share">
             <span class="material-symbols-rounded" translate="no">share</span>
-            <span>مشاركة التقرير</span>
+            <span id="unified-share-bottom-label">مشاركة الخبر</span>
           </button>
         </div>
 
-        <!-- الوسوم -->
-        <div id="reader-tags-box" class="article-tags-row hidden"></div>
+        <!-- شريط الوسوم الأفقي المتحرك -->
+        <div id="reader-tags-box" class="horizontal-tags-scroll article-tags-margin hidden"></div>
       </div>
 
-      <!-- أخبار ذات صلة -->
+      <!-- أخبار وتقارير ذات صلة -->
       <section class="bbc-news-section">
         <div class="bbc-block-header">
           <span class="bbc-red-mark"></span>
@@ -384,7 +392,7 @@
         </div>
       </div>
 
-      <div class="bbc-block-header" style="margin-top: 24px;">
+      <div class="bbc-block-header" style="margin-top: 22px;">
         <span class="bbc-red-mark"></span>
         <h2 id="author-articles-heading">مقالات الكاتب</h2>
       </div>
@@ -411,7 +419,7 @@
   </main>
 
   <!-- =====================================================================
-       7. التذييل المؤسسي النظيف (Footer)
+       8. التذييل المؤسسي النظيف (Footer)
        ===================================================================== -->
   <footer class="bbc-clean-footer">
     <div class="pub-container">
@@ -422,6 +430,7 @@
           <p id="footer-site-desc" class="footer-desc">
             منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.
           </p>
+          <div id="footer-social-links" class="footer-socials-row"></div>
         </div>
 
         <div class="footer-quick-links">
@@ -433,12 +442,12 @@
 
       <div class="footer-bottom-row">
         <span>© جميع الحقوق محفوظة لـ <strong id="copyright-site-name">حُجرية بريس</strong> — مؤسسة <strong>RAWI-YE.COM</strong></span>
-        <span dir="ltr">hujariyapress.rawi-ye.com</span>
+        <span id="footer-domain-label" dir="ltr">hujariyapress.rawi-ye.com</span>
       </div>
     </div>
   </footer>
 
-  <!-- إشعار التفاعل الخفيف (Toast) -->
+  <!-- إشعار التفاعل السريع (Toast) -->
   <div id="pub-toast" class="pub-toast hidden" role="status" aria-live="polite"></div>
 
   <!-- المحرك البرمجي للموقع العام (حُجرية بريس) -->
