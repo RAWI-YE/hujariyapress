@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title id="page-meta-title">حُجرية بريس | Hujariya Press</title>
   <meta name="description" id="page-meta-desc" content="حُجرية بريس — منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.">
-  <meta name="theme-color" content="#ef3327" id="page-theme-color">
+  <meta name="theme-color" content="#b80d38" id="page-theme-color">
 
   <!-- إعدادات تثبيت تطبيق الويب (PWA) والأيقونات الديناميكية من الإعدادات -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="حُجرية بريس">
-  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ef3327%22/><text x=%2250%%22 y=%2258%%22 font-size=%2264%22 fill=%22%23ffffff%22 font-family=%22Cairo,sans-serif%22 font-weight=%22900%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>ح</text></svg>">
+  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2216%22 fill=%22%23b80d38%22/><text x=%2250%%22 y=%2258%%22 font-size=%2264%22 fill=%22%23ffffff%22 font-family=%22Almarai,sans-serif%22 font-weight=%22800%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>ح</text></svg>">
   <link rel="apple-touch-icon" id="dynamic-apple-icon" href="">
 
   <!-- وسوم المشاركة الذكية (Open Graph & Twitter Cards) -->
@@ -23,99 +23,106 @@
   <meta property="og:url" id="og-meta-url" content="">
   <meta name="twitter:card" content="summary_large_image">
 
-  <!-- الخطوط العربية الرسمية ومكتبة الأيقونات العالمية Google Material Symbols -->
+  <!-- الخطوط الإخبارية الهندسية المطابقة لطابع الجزيرة (Almarai & Alexandria) + أيقونات Google Material -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800;900&family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@22,500,0,0" rel="stylesheet">
 
-  <!-- ملف المظهر الكلاسيكي النظيف (BBC Clean Style) -->
+  <!-- ملف المظهر الحديث بطابع الجزيرة والهوية القرمزية -->
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
   <!-- =====================================================================
-       1. شريط الطقس العلوي النحيف (كافة المدن اليمنية + المدن السعودية المهمة)
+       1. الشريط العلوي المزدوج والمدمج (الطقس الإقليمي + مؤشرات الأسواق العالمية)
+       يتحرك تلقائياً بنعومة ويعطي روح غرفة الأخبار الحية
        ===================================================================== -->
-  <div class="weather-top-strip" aria-label="حالة الطقس في اليمن والمملكة">
-    <div class="pub-container weather-strip-inner">
-      <div class="weather-strip-badge">
-        <span class="material-symbols-rounded" translate="no">partly_cloudy_day</span>
-        <span>الطقس:</span>
+  <div class="aj-top-live- utility-bars">
+    <!-- (أ) شريط الطقس المباشر -->
+    <div class="weather-top-strip" aria-label="حالة الطقس في اليمن والمملكة">
+      <div class="pub-container weather-strip-inner">
+        <div class="weather-strip-badge">
+          <span class="material-symbols-rounded" translate="no">partly_cloudy_day</span>
+          <span>الطقس</span>
+        </div>
+        <div class="ticker-viewport">
+          <div id="regional-weather-track" class="continuous-ticker-track weather-speed">
+            <span>صنعاء <strong dir="ltr">24°C</strong></span><span class="t-sep">•</span>
+            <span>عدن <strong dir="ltr">31°C</strong></span><span class="t-sep">•</span>
+            <span>تعز <strong dir="ltr">26°C</strong></span><span class="t-sep">•</span>
+            <span>الحجرية (التربة) <strong dir="ltr">23°C</strong></span><span class="t-sep">•</span>
+            <span>المكلا <strong dir="ltr">29°C</strong></span><span class="t-sep">•</span>
+            <span>مأرب <strong dir="ltr">28°C</strong></span><span class="t-sep">•</span>
+            <span>الرياض <strong dir="ltr">30°C</strong></span><span class="t-sep">•</span>
+            <span>مكة المكرمة <strong dir="ltr">33°C</strong></span><span class="t-sep">•</span>
+            <span>جدة <strong dir="ltr">31°C</strong></span>
+          </div>
+        </div>
       </div>
-      <div class="ticker-viewport">
-        <div id="regional-weather-track" class="continuous-ticker-track weather-speed">
-          <span>صنعاء <strong dir="ltr">24°C</strong></span><span class="t-sep">•</span>
-          <span>عدن <strong dir="ltr">31°C</strong></span><span class="t-sep">•</span>
-          <span>تعز <strong dir="ltr">26°C</strong></span><span class="t-sep">•</span>
-          <span>الحجرية (التربة) <strong dir="ltr">23°C</strong></span><span class="t-sep">•</span>
-          <span>المكلا <strong dir="ltr">29°C</strong></span><span class="t-sep">•</span>
-          <span>مأرب <strong dir="ltr">28°C</strong></span><span class="t-sep">•</span>
-          <span>الرياض <strong dir="ltr">30°C</strong></span><span class="t-sep">•</span>
-          <span>مكة المكرمة <strong dir="ltr">33°C</strong></span><span class="t-sep">•</span>
-          <span>جدة <strong dir="ltr">31°C</strong></span>
+    </div>
+
+    <!-- (ب) شريط مؤشرات الأسواق العالمية والعملات والطاقة -->
+    <div class="markets-strip-bar" aria-label="مؤشرات الأسواق العالمية والعملات">
+      <div class="pub-container markets-strip-inner">
+        <div class="markets-strip-badge">
+          <span class="material-symbols-rounded" translate="no">monitoring</span>
+          <span>الأسواق</span>
+        </div>
+        <div class="ticker-viewport">
+          <div id="global-markets-track" class="continuous-ticker-track markets-speed">
+            <span class="m-item">الذهب <strong dir="ltr">$2,748.20</strong> <em class="m-up">▲ +0.4%</em></span>
+            <span class="t-sep">|</span>
+            <span class="m-item">نفط برنت <strong dir="ltr">$75.10</strong> <em class="m-up">▲ +0.8%</em></span>
+            <span class="t-sep">|</span>
+            <span class="m-item">تاسي السعودي <strong dir="ltr">12,068</strong> <em class="m-up">▲ +0.3%</em></span>
+            <span class="t-sep">|</span>
+            <span class="m-item">داو جونز <strong dir="ltr">42,415</strong> <em class="m-up">▲ +0.2%</em></span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- =====================================================================
-       2. الهيدر الكلاسيكي النظيف باللون الديناميكي (القائمة + الشعار المفرغ + البحث)
+       2. الهيدر الأبيض النقي بطابع الجزيرة مع اللمسات القرمزية الفخمة
        ===================================================================== -->
-  <header class="bbc-clean-header" id="site-header-banner">
+  <header class="aj-clean-header" id="site-header-banner">
     <div class="pub-container header-main-row">
 
-      <!-- يمين الهيدر: زر القائمة الجانبية الشاملة -->
+      <!-- يمين الهيدر: زر القائمة الجانبية الشاملة بأيقونة قرمزية -->
       <button type="button" id="open-master-sidebar-btn" class="header-menu-btn" aria-label="فتح القائمة الجانبية">
         <span class="material-symbols-rounded" translate="no">menu</span>
-        <span class="menu-btn-label">القائمة</span>
+        <span class="menu-btn-label">الأقسام والقائمة</span>
       </button>
 
-      <!-- وسط الهيدر: مكان الشعار الشفاف أو الاسم النصي (يُدار بالكامل من الإعدادات) -->
+      <!-- وسط الهيدر: الشعار المفرغ في حاضنة قرمزية فخمة أو الاسم النصي -->
       <a href="#home" id="brand-home-link" class="header-brand-slot" aria-label="حُجرية بريس - الصفحة الرئيسية">
-        <img id="site-logo-img" src="" alt="حُجرية بريس" class="header-logo-img hidden">
+        <span id="header-logo-capsule" class="header-logo-capsule hidden">
+          <img id="site-logo-img" src="" alt="حُجرية بريس" class="header-logo-img hidden">
+        </span>
         <span id="site-text-brand" class="header-brand-text">حُجرية بريس</span>
       </a>
 
-      <!-- يسار الهيدر: شريط البحث المدمج -->
-      <form id="public-search-form" class="header-search-form" role="search">
-        <span class="material-symbols-rounded search-icon" translate="no">search</span>
-        <input type="search" id="public-search-input" placeholder="ابحث في الأخبار..." aria-label="ابحث في الأخبار">
-        <button type="button" id="clear-search-btn" class="clear-search-btn hidden" title="مسح البحث">
-          <span class="material-symbols-rounded" translate="no">close</span>
+      <!-- يسار الهيدر: اختصار النبض السريع + الفيديوهات القصيرة -->
+      <div class="header-quick-shortcuts">
+        <button type="button" id="header-pulse-shortcut" class="header-shortcut-pill" title="الأخبار السريعة (النبض)">
+          <span class="material-symbols-rounded" translate="no">bolt</span>
+          <span class="shortcut-text">النبض</span>
         </button>
-      </form>
+        <button type="button" id="header-shorts-shortcut" class="header-shortcut-pill" title="الفيديوهات القصيرة والمرئيات">
+          <span class="material-symbols-rounded" translate="no">smart_display</span>
+          <span class="shortcut-text">المرئيات</span>
+        </button>
+      </div>
 
     </div>
   </header>
 
   <!-- =====================================================================
-       3. شريط مؤشرات الأسواق العالمية والعملات والطاقة (تحت الهيدر مباشرة)
+       3. شريط الأقسام اللزج بطابع الجزيرة (خطوط قرمزية نشطة وتمرير سلس)
        ===================================================================== -->
-  <div class="markets-strip-bar" aria-label="مؤشرات الأسواق العالمية والعملات">
-    <div class="pub-container markets-strip-inner">
-      <div class="markets-strip-badge">
-        <span class="material-symbols-rounded" translate="no">monitoring</span>
-        <span>الأسواق:</span>
-      </div>
-      <div class="ticker-viewport">
-        <div id="global-markets-track" class="continuous-ticker-track markets-speed">
-          <span class="m-item">الذهب <strong dir="ltr">$2,748.20</strong> <em class="m-up">▲ +0.4%</em></span>
-          <span class="t-sep">|</span>
-          <span class="m-item">نفط برنت <strong dir="ltr">$75.10</strong> <em class="m-up">▲ +0.8%</em></span>
-          <span class="t-sep">|</span>
-          <span class="m-item">تاسي السعودي <strong dir="ltr">12,068</strong> <em class="m-up">▲ +0.3%</em></span>
-          <span class="t-sep">|</span>
-          <span class="m-item">داو جونز <strong dir="ltr">42,415</strong> <em class="m-up">▲ +0.2%</em></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- =====================================================================
-       4. شريط الأقسام الكلاسيكي النظيف (BBC Horizontal Tabs)
-       ===================================================================== -->
-  <nav class="bbc-categories-bar" aria-label="أقسام الموقع">
+  <nav class="aj-categories-bar" aria-label="أقسام الموقع">
     <div class="pub-container">
       <div id="public-compasses-nav" class="categories-scroll-row">
         <button type="button" class="cat-tab-btn active" data-compass-filter="all">الرئيسية</button>
@@ -131,7 +138,7 @@
   </div>
 
   <!-- =====================================================================
-       5. شريط الأخبار العاجلة التلفزيوني المتحرك
+       4. شريط الأخبار العاجلة القرمزي المتحرك تلقائياً (تحت شريط الأقسام مباشرة)
        ===================================================================== -->
   <section id="breaking-news-bar" class="tv-breaking-bar hidden" aria-label="أخبار عاجلة">
     <div class="pub-container tv-breaking-inner">
@@ -146,13 +153,15 @@
   </section>
 
   <!-- =====================================================================
-       6. القائمة الجانبية الشاملة (تفتح صفحات الأقسام مباشرة بضغطة واحدة)
+       5. القائمة الجانبية الشاملة (تفتح صفحات الأقسام مباشرة بضغطة واحدة)
        ===================================================================== -->
   <div id="master-sidebar-backdrop" class="sidebar-backdrop hidden"></div>
   <aside id="master-sidebar-drawer" class="master-sidebar-drawer hidden" aria-label="القائمة الجانبية الشاملة">
     <div class="sidebar-drawer-header">
       <div class="sidebar-header-brand">
-        <img id="sidebar-logo-img" src="" alt="" class="sidebar-logo-img hidden">
+        <span id="sidebar-logo-capsule" class="sidebar-logo-capsule hidden">
+          <img id="sidebar-logo-img" src="" alt="" class="sidebar-logo-img hidden">
+        </span>
         <strong id="sidebar-brand-title" class="sidebar-brand-title">حُجرية بريس</strong>
       </div>
       <button type="button" id="close-master-sidebar-btn" class="sidebar-close-btn" aria-label="إغلاق القائمة">
@@ -200,7 +209,7 @@
             <span class="material-symbols-rounded" translate="no">gavel</span>
             <span>ميثاق الشرف الصحفي</span>
           </button>
-          <button type="button" class="sidebar-page-link" data-open-page="privacy">
+          <button type="button" id="sidebar-privacy-btn" class="sidebar-page-link" data-open-page="privacy">
             <span class="material-symbols-rounded" translate="no">verified_user</span>
             <span>سياسة الخصوصية</span>
           </button>
@@ -221,17 +230,17 @@
   </aside>
 
   <!-- =====================================================================
-       7. مساحة المحتوى الإخباري الرئيسية
+       6. مساحة المحتوى الإخباري الرئيسية (أسلوب الجزيرة الحديث)
        ===================================================================== -->
   <main class="pub-container main-workspace">
 
     <!-- المساحة الإعلانية العلوية -->
     <div id="ad-slot-top" class="ad-slot-container hidden"></div>
 
-    <!-- شريط عنوان القسم أو الفلتر المفتوح حالياً -->
+    <!-- شريط عنوان القسم أو البحث المفتوح حالياً -->
     <div id="active-filter-banner" class="active-filter-banner hidden">
       <div class="filter-banner-info">
-        <span class="bbc-red-mark"></span>
+        <span class="aj-crimson-pillar"></span>
         <strong id="active-filter-title">نتائج العرض</strong>
       </div>
       <button type="button" id="reset-all-filters-btn" class="btn-clean-reset">
@@ -241,18 +250,18 @@
     </div>
 
     <!-- =================================================================
-         (أ) واجهة الصفحة الرئيسية وصفحات الأقسام (تعرض أول تصنيفين فقط لكل بطاقة)
+         (أ) واجهة الصفحة الرئيسية وصفحات الأقسام
          ================================================================= -->
     <div id="view-home" class="app-view">
 
-      <!-- التغطية الرئيسية البارزة (Hero Story) -->
+      <!-- شبكة التغطية الرئيسية غير المتماثلة بطابع الجزيرة (Asymmetric Hero Grid) -->
       <section id="hero-featured-section" class="hero-featured-section">
-        <div id="hero-featured-box" class="bbc-lead-story-slot">
+        <div id="hero-featured-box" class="aj-hero-slot">
           <div class="skeleton-box hero-skeleton">جاري تحميل التغطية الرئيسية...</div>
         </div>
       </section>
 
-      <!-- شريط موجز الأخبار السريعة -->
+      <!-- شريط موجز الأخبار السريعة (النبض) بلمسة قرمزية -->
       <section id="quick-pulse-strip-section" class="quick-pulse-strip-section" aria-label="موجز الأخبار السريعة">
         <div class="pulse-strip-header">
           <div class="pulse-header-right">
@@ -266,11 +275,11 @@
         </div>
       </section>
 
-      <!-- شريط الفيديوهات القصيرة والمرئيات (BBC Shorts / Reels 9:16) -->
+      <!-- شريط الفيديوهات القصيرة والمرئيات (9:16) -->
       <section id="shorts-reels-section" class="shorts-reels-section hidden" aria-label="الفيديوهات القصيرة والمرئيات">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
-          <span class="material-symbols-rounded" style="color:var(--brand-red);font-size:20px;" translate="no">smart_display</span>
+        <div class="aj-block-header">
+          <span class="aj-crimson-pillar"></span>
+          <span class="material-symbols-rounded" style="color:var(--brand-red);font-size:22px;" translate="no">smart_display</span>
           <h2>الفيديوهات القصيرة والمرئيات</h2>
           <button type="button" id="view-all-shorts-btn" class="pulse-more-btn" style="margin-right:auto;">كل المرئيات</button>
         </div>
@@ -281,14 +290,14 @@
       <div id="ad-slot-middle" class="ad-slot-container hidden"></div>
 
       <!-- شبكة الأخبار والتقارير والتحليلات -->
-      <section class="bbc-news-section" aria-label="أحدث الأخبار والتقارير">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
+      <section class="aj-news-section" aria-label="أحدث الأخبار والتقارير">
+        <div class="aj-block-header">
+          <span class="aj-crimson-pillar"></span>
           <h2 id="feed-section-heading">أحدث الأخبار والتقارير</h2>
           <span id="feed-posts-counter" class="feed-count-text"></span>
         </div>
 
-        <div id="public-posts-grid" class="bbc-news-grid">
+        <div id="public-posts-grid" class="aj-news-grid">
           <div class="skeleton-box"></div>
           <div class="skeleton-box"></div>
           <div class="skeleton-box"></div>
@@ -302,11 +311,11 @@
         </div>
       </section>
 
-      <!-- زاوية كُتّاب وأقلام «حُجرية بريس» -->
-      <section id="writers-strip-section" class="bbc-writers-section hidden" aria-label="أقلام وكُتّاب حُجرية بريس">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
-          <h2>أقلام وكُتّاب حُجرية بريس</h2>
+      <!-- زاوية كُتّاب وأقلام «حُجرية بريس» (طابع آراء الجزيرة) -->
+      <section id="writers-strip-section" class="aj-writers-section hidden" aria-label="أقلام وكُتّاب حُجرية بريس">
+        <div class="aj-block-header">
+          <span class="aj-crimson-pillar"></span>
+          <h2>الآراء وأقلام حُجرية بريس</h2>
         </div>
         <div id="writers-horizontal-list" class="writers-clean-row"></div>
       </section>
@@ -314,7 +323,7 @@
     </div>
 
     <!-- =================================================================
-         (ب) واجهة قراءة الخبر الكامل (تعرض كل التصنيفات + الصور المدمجة بين الفقرات)
+         (ب) واجهة قراءة الخبر الكامل (مع الصور المدمجة بين الفقرات)
          ================================================================= -->
     <article id="view-article" class="app-view hidden">
       <div class="article-top-nav">
@@ -327,7 +336,7 @@
         <div id="article-categories-badges" class="horizontal-tags-scroll"></div>
       </div>
 
-      <div class="bbc-article-sheet">
+      <div class="aj-article-sheet">
         <h1 id="reader-article-title" class="article-main-headline"></h1>
 
         <!-- الملخص الإخباري (الزبدة) -->
@@ -358,15 +367,15 @@
         <!-- صورة المقال البارزة الرئيسية -->
         <figure id="reader-media-figure" class="article-main-figure"></figure>
 
-        <!-- النص الكامل للخبر (يدعم الصور المتعددة بين الفقرات + الروابط والمصادر) -->
+        <!-- النص الكامل للخبر (مهيأ للصور المتعددة بين الفقرات + الروابط والمصادر) -->
         <div id="reader-article-content" class="article-body-prose"></div>
 
         <!-- شريط مشاركة سفلي موحد -->
         <div class="article-bottom-share">
-          <span>شارك هذا الخبر مع الآخرين:</span>
+          <span>شارك هذا التقرير مع الآخرين:</span>
           <button type="button" id="unified-share-bottom-btn" class="btn-unified-share">
             <span class="material-symbols-rounded" translate="no">share</span>
-            <span id="unified-share-bottom-label">مشاركة الخبر</span>
+            <span id="unified-share-bottom-label">مشاركة التقرير</span>
           </button>
         </div>
 
@@ -375,12 +384,12 @@
       </div>
 
       <!-- أخبار وتقارير ذات صلة -->
-      <section class="bbc-news-section">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
+      <section class="aj-news-section">
+        <div class="aj-block-header">
+          <span class="aj-crimson-pillar"></span>
           <h2>أخبار وتقارير ذات صلة</h2>
         </div>
-        <div id="related-posts-grid" class="bbc-news-grid"></div>
+        <div id="related-posts-grid" class="aj-news-grid"></div>
       </section>
     </article>
 
@@ -407,11 +416,11 @@
         </div>
       </div>
 
-      <div class="bbc-block-header" style="margin-top: 22px;">
-        <span class="bbc-red-mark"></span>
+      <div class="aj-block-header" style="margin-top: 24px;">
+        <span class="aj-crimson-pillar"></span>
         <h2 id="author-articles-heading">مقالات الكاتب</h2>
       </div>
-      <div id="author-posts-grid" class="bbc-news-grid"></div>
+      <div id="author-posts-grid" class="aj-news-grid"></div>
     </section>
 
     <!-- =================================================================
@@ -425,13 +434,34 @@
         </button>
       </div>
 
-      <div class="bbc-article-sheet">
+      <div class="aj-article-sheet">
         <h1 id="static-page-title" class="article-main-headline"></h1>
         <div id="static-page-body" class="article-body-prose"></div>
       </div>
     </section>
 
   </main>
+
+  <!-- =====================================================================
+       7. شريط البحث الذكي العائم في الأسفل (Smart Floating Live Search Pill)
+       مفتوح دائماً ويبحث فورياً مع كتابة كل حرف بدون زر تأكيد
+       ===================================================================== -->
+  <div id="floating-smart-search-dock" class="floating-search-dock" role="search" aria-label="البحث الذكي الفوري">
+    <form id="public-search-form" class="floating-search-pill">
+      <span class="material-symbols-rounded floating-search-icon" translate="no">manage_search</span>
+      <input
+        type="search"
+        id="public-search-input"
+        placeholder="ابحث فورياً في الأخبار، التقارير، أو الكتّاب..."
+        aria-label="ابحث فورياً في الأخبار"
+        autocomplete="off"
+      >
+      <span id="floating-search-count" class="floating-search-count hidden">0</span>
+      <button type="button" id="clear-search-btn" class="clear-search-btn hidden" title="مسح البحث">
+        <span class="material-symbols-rounded" translate="no">close</span>
+      </button>
+    </form>
+  </div>
 
   <!-- =====================================================================
        8. عارض الصور المكبر (Lightbox) للصور المدمجة داخل المقالات
@@ -447,9 +477,9 @@
   </div>
 
   <!-- =====================================================================
-       9. التذييل المؤسسي النظيف (Footer)
+       9. التذييل المؤسسي الفخم (Footer)
        ===================================================================== -->
-  <footer class="bbc-clean-footer">
+  <footer class="aj-clean-footer">
     <div class="pub-container">
       <div class="footer-top-row">
         <div class="footer-brand-info">
