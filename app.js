@@ -1,11 +1,10 @@
 /* ==========================================================================
    حُجرية بريس (Hujariya Press) — المحرك البرمجي الكلاسيكي النظيف (الموقع العام)
-   النسخة المحصّنة الشاملة:
+   النسخة المحصّنة:
+   - عرض أول تصنيفين فقط (2 Categories Max) على بطاقات الأخبار في الصفحة الرئيسية والأقسام
+   - عرض كافة التصنيفات داخل صفحة قراءة المقال فقط
    - دعم الصور المتعددة المدمجة بين فقرات المقال (Inline Images & Figures) + عارض Lightbox
-   - حماية شريط التصنيفات الأفقي في الجوال من كسر البطاقات أو الفتح الخاطئ أثناء السحب
-   - تطهير أمني (XSS Sanitizer) + تفعيل الروابط والمصادر والهاشتاجات تلقائياً
    - الفيديوهات القصيرة العمودية (BBC Shorts 9:16) والفيديوهات العريضة (16:9)
-   - مشاركة الخبر مع الصورة الفعلية والملخص والرابط الديناميكي + إحصائيات الإعلانات
    ========================================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -36,8 +35,8 @@ const db = getFirestore(app);
 const VIEWED_POSTS_STORAGE_KEY = "hujariya_unique_views_v3";
 const VIEWED_ADS_SESSION_KEY = "hujariya_ad_impressions_v1";
 const MAX_ALLOWED_TAGS = 3;
+const MAX_CARD_CATEGORIES = 2; // الحد الأقصى للتصنيفات الظاهرة على بطاقات الصفحة الرئيسية
 
-// توليد الرابط الأساسي الحقيقي للموقع ديناميكياً
 function getDynamicSiteBaseUrl() {
   try {
     const origin = window.location.origin;
@@ -182,8 +181,8 @@ const state = {
   posts: [],
   staff: [],
   ads: [],
-  activeView: "home", // home | article | author | static
-  activeCompass: "all", // all | pulse-only | shorts-only | <compassName>
+  activeView: "home",
+  activeCompass: "all",
   activeSubcategory: "all",
   activeTag: "",
   searchQuery: "",
@@ -342,7 +341,6 @@ function isSafeImageSrc(src = "") {
 function sanitizeAndFormatArticleHtml(rawHtml = "") {
   if (!rawHtml) return "";
 
-  // دعم الاختصار السريع لإدراج صورة بين الفقرات إن كُتب نصياً: [صورة: رابط | وصف]
   let preprocessedHtml = String(rawHtml).replace(
     /\[صورة:\s*([^\]|\s]+)(?:\s*\|\s*([^\]]+))?\]/g,
     (_, imgUrl, caption) => {
@@ -359,12 +357,10 @@ function sanitizeAndFormatArticleHtml(rawHtml = "") {
   const container = document.createElement("div");
   container.innerHTML = preprocessedHtml;
 
-  // 1. إزالة العناصر الخطرة أمنياً (XSS Protection) مع الحفاظ الكامل على الصور والأطر الصحفية (img, figure, figcaption)
   container
     .querySelectorAll("script, style, object, embed, form, input, button, meta, link, iframe")
     .forEach((el) => el.remove());
 
-  // 2. تأمين جميع العناصر والروابط والصور المدمجة داخل النص
   container.querySelectorAll("*").forEach((el) => {
     Array.from(el.attributes).forEach((attr) => {
       const name = attr.name.toLowerCase();
@@ -405,7 +401,6 @@ function sanitizeAndFormatArticleHtml(rawHtml = "") {
     }
   });
 
-  // 3. معالجة العقد النصية لتحويل الروابط المكتوبة والهاشتاجات دون كسر وسوم HTML أو الصور
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
   const textNodes = [];
   let currentNode;
@@ -476,7 +471,7 @@ function sanitizeAndFormatArticleHtml(rawHtml = "") {
   return container.innerHTML;
 }
 
-// ==================== عارض الصور المكبر (Lightbox) للصور داخل المقال ====================
+// ==================== عارض الصور المكبر (Lightbox) ====================
 function openImageLightbox(src, caption = "") {
   if (!src) return;
   const modal = document.getElementById("inline-image-lightbox");
@@ -560,7 +555,8 @@ function getPostCompasses(post) {
   return list.length ? list : ["السياسة اليمنية"];
 }
 
-function buildHorizontalCategoriesHtml(post) {
+// ==================== دالة تصنيفات البطاقات الذكية (تعرض أول تصنيفين فقط في الصفحة الرئيسية) ====================
+function buildCardCategoriesHtml(post, maxLimit = MAX_CARD_CATEGORIES) {
   const cats = getPostCompasses(post);
   const subcats = [];
   if (Array.isArray(post?.subcategories)) {
@@ -572,24 +568,46 @@ function buildHorizontalCategoriesHtml(post) {
     subcats.push(post.subcategory);
   }
 
+  // جمع كافة التصنيفات ثم الاكتفاء بأول تصنيفين فقط (maxLimit = 2) لمنع التشوه والانكماش في الجوال
+  const allBadgeObjects = [
+    ...cats.map((c) => ({
+      type: "cat",
+      raw: c,
+      label: getCleanCategoryLabel(c)
+    })),
+    ...subcats.map((s) => ({
+      type: "sub",
+      raw: s,
+      label: s
+    }))
+  ];
+
+  const visibleSlice = allBadgeObjects.slice(0, maxLimit);
+  const hiddenCount = Math.max(0, allBadgeObjects.length - visibleSlice.length);
+
   const videoBadge = isPostVideo(post)
     ? `<span class="card-video-pill">${
         isPostShortVerticalVideo(post) ? "📱 فيديو قصير" : "▶ فيديو"
       }${post.videoDuration ? ` (${escapeHtml(post.videoDuration)})` : ""}</span>`
     : "";
 
-  const pills = [
-    videoBadge,
-    ...cats.map(
-      (c) =>
-        `<span class="card-cat-pill" data-card-cat="${escapeHtml(c)}">${escapeHtml(
-          getCleanCategoryLabel(c)
-        )}</span>`
-    ),
-    ...subcats.map((s) => `<span class="card-subcat-pill">${escapeHtml(s)}</span>`)
-  ].filter(Boolean);
+  const pillsHtml = visibleSlice
+    .map((item) => {
+      if (item.type === "cat") {
+        return `<span class="card-cat-pill" data-card-cat="${escapeHtml(
+          item.raw
+        )}">${escapeHtml(item.label)}</span>`;
+      }
+      return `<span class="card-subcat-pill">${escapeHtml(item.label)}</span>`;
+    })
+    .join("");
 
-  return `<div class="horizontal-tags-scroll" data-scroll-strip="true" title="اسحب أفقياً لتصفح التصنيفات">${pills.join("")}</div>`;
+  const moreBadgeHtml =
+    hiddenCount > 0
+      ? `<span class="card-more-cats-pill" title="يوجد ${hiddenCount} تصنيفات إضافية داخل الخبر">+${hiddenCount}</span>`
+      : "";
+
+  return `<div class="card-categories-row">${videoBadge}${pillsHtml}${moreBadgeHtml}</div>`;
 }
 
 function postMatchesCompass(post, targetCompass) {
@@ -1216,7 +1234,7 @@ function renderHeroAndPulseSection() {
         </div>
         <div class="lead-story-body">
           <div>
-            ${buildHorizontalCategoriesHtml(heroPost)}
+            ${buildCardCategoriesHtml(heroPost, MAX_CARD_CATEGORIES)}
             <h2 class="lead-story-title">${escapeHtml(heroPost.title)}</h2>
             <p class="lead-story-summary">${escapeHtml(summaryText)}</p>
           </div>
@@ -1319,7 +1337,7 @@ function buildNewsCardHtml(post) {
       </div>
       <div class="bbc-card-content">
         <div>
-          ${buildHorizontalCategoriesHtml(post)}
+          ${buildCardCategoriesHtml(post, MAX_CARD_CATEGORIES)}
           <h3 class="bbc-card-title">${escapeHtml(post.title)}</h3>
           <p class="bbc-card-excerpt">${escapeHtml(excerpt)}</p>
         </div>
@@ -1339,38 +1357,8 @@ function buildNewsCardHtml(post) {
   `;
 }
 
-// ربط أحداث البطاقات مع حماية التمرير الأفقي للتصنيفات في الجوال حتى لا يفتح المقال بالخطأ أثناء السحب
 function bindCardInteractiveEvents(container) {
   if (!container) return;
-
-  container.querySelectorAll("[data-scroll-strip]").forEach((strip) => {
-    let startX = 0;
-    let isDragging = false;
-    strip.addEventListener(
-      "touchstart",
-      (e) => {
-        startX = e.touches[0]?.clientX || 0;
-        isDragging = false;
-      },
-      { passive: true }
-    );
-    strip.addEventListener(
-      "touchmove",
-      (e) => {
-        const currentX = e.touches[0]?.clientX || 0;
-        if (Math.abs(currentX - startX) > 8) {
-          isDragging = true;
-        }
-      },
-      { passive: true }
-    );
-    strip.addEventListener("click", (e) => {
-      if (isDragging) {
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    });
-  });
 
   container.querySelectorAll("[data-open-post]").forEach((card) => {
     card.addEventListener("click", (e) => {
@@ -1645,7 +1633,7 @@ async function shareArticleUnified(post, triggerBtn = null) {
   }
 }
 
-// ==================== 11. قارئ الخبر الكامل، الصور المدمجة، ومشغل الفيديو الذكي ====================
+// ==================== 11. قارئ الخبر الكامل (يعرض جميع التصنيفات والصور المدمجة) ====================
 function buildSmartVideoPlayerHtml(post) {
   const rawUrl = String(post?.videoUrl || "").trim();
   if (!rawUrl) return "";
@@ -1734,6 +1722,7 @@ function openArticleReader(postId, updateHistory = true) {
     } catch (_) {}
   }
 
+  // داخل صفحة المقال فقط: عرض جميع التصنيفات والتفرعات الخاصة بالخبر
   const badgesEl = document.getElementById("article-categories-badges");
   if (badgesEl) {
     const subcats = [];
@@ -1799,7 +1788,6 @@ function openArticleReader(postId, updateHistory = true) {
     shareBottomBtn.onclick = () => shareArticleUnified(post, shareBottomBtn);
   }
 
-  // مشغل الفيديو الذكي والصورة البارزة
   const videoBox = document.getElementById("reader-video-box");
   const mediaFig = document.getElementById("reader-media-figure");
   const videoPlayerHtml = buildSmartVideoPlayerHtml(post);
@@ -1824,7 +1812,6 @@ function openArticleReader(postId, updateHistory = true) {
     }
   }
 
-  // نص المقال الكامل مع تفعيل الصور المتعددة المدمجة بين الفقرات وعارض التكبير (Lightbox)
   const contentEl = document.getElementById("reader-article-content");
   if (contentEl) {
     contentEl.innerHTML = sanitizeAndFormatArticleHtml(post.content || "");
@@ -1837,7 +1824,6 @@ function openArticleReader(postId, updateHistory = true) {
     });
   }
 
-  // شريط الوسوم أسفل المقال (مقيد بـ 3 وسوم كحد أقصى)
   const tagsBox = document.getElementById("reader-tags-box");
   const tags = Array.isArray(post.tags)
     ? post.tags.filter(Boolean).slice(0, MAX_ALLOWED_TAGS)
@@ -2109,7 +2095,6 @@ function bindPublicEvents() {
     renderPublicPostsFeed();
   });
 
-  // أحداث إغلاق عارض الصور المكبر (Lightbox)
   document
     .getElementById("close-lightbox-btn")
     ?.addEventListener("click", closeImageLightbox);
