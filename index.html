@@ -1,484 +1,1886 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title id="page-meta-title">حُجرية بريس | Hujariya Press</title>
-  <meta name="description" id="page-meta-desc" content="حُجرية بريس — منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.">
-  <meta name="theme-color" content="#ef3327" id="page-theme-color">
+/* ==========================================================================
+   حُجرية بريس (Hujariya Press) — التصميم الكلاسيكي النظيف المستوحى من BBC News
+   النسخة المحصّنة للجوال:
+   1. عرض أول تصنيفين فقط في بطاقات الصفحة الرئيسية لمنع تمدد وانكماش شاشة الجوال
+   2. قفل عرض المتصفح (overflow-x: clip) لمنع ظهور أي فراغ جانبي في الهواتف
+   3. دعم الصور المتعددة المدمجة بين فقرات المقال + عارض Lightbox + الفيديوهات (9:16 و 16:9)
+   ========================================================================== */
 
-  <!-- إعدادات تثبيت تطبيق الويب (PWA) والأيقونات الديناميكية من الإعدادات -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="حُجرية بريس">
-  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ef3327%22/><text x=%2250%%22 y=%2258%%22 font-size=%2264%22 fill=%22%23ffffff%22 font-family=%22Cairo,sans-serif%22 font-weight=%22900%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>ح</text></svg>">
-  <link rel="apple-touch-icon" id="dynamic-apple-icon" href="">
+:root {
+  --brand-red: #ef3327;
+  --brand-red-dark: #c81e14;
+  --breaking-red: #991b1b;
 
-  <!-- وسوم المشاركة الذكية (Open Graph & Twitter Cards) -->
-  <meta property="og:type" content="article">
-  <meta property="og:site_name" content="حُجرية بريس | Hujariya Press">
-  <meta property="og:title" id="og-meta-title" content="حُجرية بريس | Hujariya Press">
-  <meta property="og:description" id="og-meta-desc" content="منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.">
-  <meta property="og:image" id="og-meta-image" content="">
-  <meta property="og:url" id="og-meta-url" content="">
-  <meta name="twitter:card" content="summary_large_image">
+  /* خلفية نهارية بيضاء مكسورة مريحة للعين */
+  --bg-page: #f6f5f2;
+  --bg-card: #ffffff;
+  --bg-subtle: #ebe9e4;
 
-  <!-- الخطوط العربية الرسمية ومكتبة الأيقونات العالمية Google Material Symbols -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@22,500,0,0" rel="stylesheet">
+  /* نصوص واضحة للقراءة الإخبارية السريعة */
+  --text-main: #141414;
+  --text-body: #2c2c30;
+  --text-muted: #66666e;
 
-  <!-- ملف المظهر الكلاسيكي النظيف (BBC Clean Style) -->
-  <link rel="stylesheet" href="./style.css">
-</head>
-<body>
+  --border-light: #e0ded8;
+  --border-med: #c8c5bc;
+  --verified-blue: #0284c7;
+  --up-green: #16a34a;
+  --down-red: #dc2626;
+}
 
-  <!-- =====================================================================
-       1. شريط الطقس العلوي النحيف (كافة المدن اليمنية + المدن السعودية المهمة)
-       ===================================================================== -->
-  <div class="weather-top-strip" aria-label="حالة الطقس في اليمن والمملكة">
-    <div class="pub-container weather-strip-inner">
-      <div class="weather-strip-badge">
-        <span class="material-symbols-rounded" translate="no">partly_cloudy_day</span>
-        <span>الطقس:</span>
-      </div>
-      <div class="ticker-viewport">
-        <div id="regional-weather-track" class="continuous-ticker-track weather-speed">
-          <span>صنعاء <strong dir="ltr">24°C</strong></span><span class="t-sep">•</span>
-          <span>عدن <strong dir="ltr">31°C</strong></span><span class="t-sep">•</span>
-          <span>تعز <strong dir="ltr">26°C</strong></span><span class="t-sep">•</span>
-          <span>الحجرية (التربة) <strong dir="ltr">23°C</strong></span><span class="t-sep">•</span>
-          <span>المكلا <strong dir="ltr">29°C</strong></span><span class="t-sep">•</span>
-          <span>مأرب <strong dir="ltr">28°C</strong></span><span class="t-sep">•</span>
-          <span>الرياض <strong dir="ltr">30°C</strong></span><span class="t-sep">•</span>
-          <span>مكة المكرمة <strong dir="ltr">33°C</strong></span><span class="t-sep">•</span>
-          <span>جدة <strong dir="ltr">31°C</strong></span>
-        </div>
-      </div>
-    </div>
-  </div>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
 
-  <!-- =====================================================================
-       2. الهيدر الكلاسيكي النظيف باللون الديناميكي (القائمة + الشعار المفرغ + البحث)
-       ===================================================================== -->
-  <header class="bbc-clean-header" id="site-header-banner">
-    <div class="pub-container header-main-row">
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
 
-      <!-- يمين الهيدر: زر القائمة الجانبية الشاملة -->
-      <button type="button" id="open-master-sidebar-btn" class="header-menu-btn" aria-label="فتح القائمة الجانبية">
-        <span class="material-symbols-rounded" translate="no">menu</span>
-        <span class="menu-btn-label">القائمة</span>
-      </button>
+body {
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+  position: relative;
+}
 
-      <!-- وسط الهيدر: مكان الشعار الشفاف أو الاسم النصي (يُدار بالكامل من الإعدادات) -->
-      <a href="#home" id="brand-home-link" class="header-brand-slot" aria-label="حُجرية بريس - الصفحة الرئيسية">
-        <img id="site-logo-img" src="" alt="حُجرية بريس" class="header-logo-img hidden">
-        <span id="site-text-brand" class="header-brand-text">حُجرية بريس</span>
-      </a>
+img {
+  max-width: 100%;
+  display: block;
+}
 
-      <!-- يسار الهيدر: شريط البحث المدمج -->
-      <form id="public-search-form" class="header-search-form" role="search">
-        <span class="material-symbols-rounded search-icon" translate="no">search</span>
-        <input type="search" id="public-search-input" placeholder="ابحث في الأخبار..." aria-label="ابحث في الأخبار">
-        <button type="button" id="clear-search-btn" class="clear-search-btn hidden" title="مسح البحث">
-          <span class="material-symbols-rounded" translate="no">close</span>
-        </button>
-      </form>
+button, input {
+  font-family: inherit;
+}
 
-    </div>
-  </header>
+button {
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
 
-  <!-- =====================================================================
-       3. شريط مؤشرات الأسواق العالمية والعملات والطاقة (تحت الهيدر مباشرة)
-       ===================================================================== -->
-  <div class="markets-strip-bar" aria-label="مؤشرات الأسواق العالمية والعملات">
-    <div class="pub-container markets-strip-inner">
-      <div class="markets-strip-badge">
-        <span class="material-symbols-rounded" translate="no">monitoring</span>
-        <span>الأسواق:</span>
-      </div>
-      <div class="ticker-viewport">
-        <div id="global-markets-track" class="continuous-ticker-track markets-speed">
-          <span class="m-item">الذهب <strong dir="ltr">$2,748.20</strong> <em class="m-up">▲ +0.4%</em></span>
-          <span class="t-sep">|</span>
-          <span class="m-item">نفط برنت <strong dir="ltr">$75.10</strong> <em class="m-up">▲ +0.8%</em></span>
-          <span class="t-sep">|</span>
-          <span class="m-item">تاسي السعودي <strong dir="ltr">12,068</strong> <em class="m-up">▲ +0.3%</em></span>
-          <span class="t-sep">|</span>
-          <span class="m-item">داو جونز <strong dir="ltr">42,415</strong> <em class="m-up">▲ +0.2%</em></span>
-        </div>
-      </div>
-    </div>
-  </div>
+button:active {
+  transform: scale(0.97);
+}
 
-  <!-- =====================================================================
-       4. شريط الأقسام الكلاسيكي النظيف (BBC Horizontal Tabs)
-       ===================================================================== -->
-  <nav class="bbc-categories-bar" aria-label="أقسام الموقع">
-    <div class="pub-container">
-      <div id="public-compasses-nav" class="categories-scroll-row">
-        <button type="button" class="cat-tab-btn active" data-compass-filter="all">الرئيسية</button>
-      </div>
-    </div>
-  </nav>
+.hidden {
+  display: none !important;
+}
 
-  <!-- شريط التصنيفات الفرعية (يظهر عند اختيار قسم معين) -->
-  <div id="subcategories-bar-wrap" class="subcategories-bar-wrap hidden">
-    <div class="pub-container">
-      <div id="public-subcategories-list" class="subcategories-scroll-row"></div>
-    </div>
-  </div>
+.pub-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 14px;
+  overflow-x: clip;
+}
 
-  <!-- =====================================================================
-       5. شريط الأخبار العاجلة التلفزيوني المتحرك
-       ===================================================================== -->
-  <section id="breaking-news-bar" class="tv-breaking-bar hidden" aria-label="أخبار عاجلة">
-    <div class="pub-container tv-breaking-inner">
-      <div class="tv-breaking-badge">
-        <span class="pulse-dot"></span>
-        <strong>عاجل</strong>
-      </div>
-      <div class="ticker-viewport">
-        <div id="breaking-ticker-items" class="continuous-ticker-track breaking-speed"></div>
-      </div>
-    </div>
-  </section>
+/* ==================== محرك الأشرطة التلفزيونية المتحركة (طقس / أسواق / عاجل) ==================== */
+.ticker-viewport {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  direction: rtl;
+}
 
-  <!-- =====================================================================
-       6. القائمة الجانبية الشاملة (تفتح صفحات الأقسام مباشرة بضغطة واحدة)
-       ===================================================================== -->
-  <div id="master-sidebar-backdrop" class="sidebar-backdrop hidden"></div>
-  <aside id="master-sidebar-drawer" class="master-sidebar-drawer hidden" aria-label="القائمة الجانبية الشاملة">
-    <div class="sidebar-drawer-header">
-      <div class="sidebar-header-brand">
-        <img id="sidebar-logo-img" src="" alt="" class="sidebar-logo-img hidden">
-        <strong id="sidebar-brand-title" class="sidebar-brand-title">حُجرية بريس</strong>
-      </div>
-      <button type="button" id="close-master-sidebar-btn" class="sidebar-close-btn" aria-label="إغلاق القائمة">
-        <span class="material-symbols-rounded" translate="no">close</span>
-      </button>
-    </div>
+.continuous-ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  white-space: nowrap;
+  will-change: transform;
+  animation-name: smoothTickerMove;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
 
-    <div class="sidebar-drawer-body">
-      <div class="sidebar-section-block">
-        <button type="button" id="sidebar-home-btn" class="sidebar-page-link active">
-          <span class="material-symbols-rounded" translate="no">home</span>
-          <span>الصفحة الرئيسية</span>
-        </button>
-        <button type="button" id="sidebar-pulse-page-btn" class="sidebar-page-link">
-          <span class="material-symbols-rounded" translate="no">bolt</span>
-          <span>صفحة الأخبار السريعة (النبض)</span>
-        </button>
-        <button type="button" id="sidebar-shorts-page-btn" class="sidebar-page-link">
-          <span class="material-symbols-rounded" translate="no">smart_display</span>
-          <span>الفيديوهات القصيرة والمرئيات</span>
-        </button>
-      </div>
+.weather-speed { animation-duration: 42s; }
+.markets-speed { animation-duration: 38s; }
+.breaking-speed { animation-duration: 28s; }
 
-      <!-- أقسام الموقع المباشرة -->
-      <div class="sidebar-section-block">
-        <span class="sidebar-block-title">أقسام حُجرية بريس</span>
-        <div id="sidebar-categories-direct-list" class="sidebar-direct-grid"></div>
-      </div>
+.ticker-viewport:hover .continuous-ticker-track,
+.ticker-viewport:active .continuous-ticker-track {
+  animation-play-state: paused;
+}
 
-      <!-- زاوية الكُتّاب ومقالات الرأي -->
-      <div id="sidebar-writers-block" class="sidebar-section-block hidden">
-        <span class="sidebar-block-title">أقلام وكُتّاب المنصة</span>
-        <div id="sidebar-writers-list" class="sidebar-writers-list"></div>
-      </div>
+@keyframes smoothTickerMove {
+  0% { transform: translateX(-10%); }
+  100% { transform: translateX(100%); }
+}
 
-      <!-- الصفحات المؤسسية الثابتة -->
-      <div class="sidebar-section-block">
-        <span class="sidebar-block-title">عن المنصة والمواثيق</span>
-        <div class="sidebar-pages-list">
-          <button type="button" class="sidebar-page-link" data-open-page="about">
-            <span class="material-symbols-rounded" translate="no">info</span>
-            <span>من نحن والتوجيه الوطني</span>
-          </button>
-          <button type="button" class="sidebar-page-link" data-open-page="charter">
-            <span class="material-symbols-rounded" translate="no">gavel</span>
-            <span>ميثاق الشرف الصحفي</span>
-          </button>
-          <button type="button" class="sidebar-page-link" data-open-page="privacy">
-            <span class="material-symbols-rounded" translate="no">verified_user</span>
-            <span>سياسة الخصوصية</span>
-          </button>
-        </div>
-      </div>
+.t-sep {
+  opacity: 0.4;
+  font-size: 0.72rem;
+}
 
-      <!-- منصات التواصل الاجتماعي -->
-      <div id="sidebar-socials-wrap" class="sidebar-section-block hidden">
-        <span class="sidebar-block-title">تابعنا على منصات التواصل</span>
-        <div id="sidebar-social-links" class="sidebar-socials-grid"></div>
-      </div>
-    </div>
+/* ==================== 1. شريط الطقس العلوي النحيف ==================== */
+.weather-top-strip {
+  background-color: #141417;
+  color: #e4e4e7;
+  height: 27px;
+  font-size: 0.73rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  width: 100%;
+}
 
-    <div class="sidebar-drawer-footer">
-      <span>مؤسسة <strong>RAWI-YE.COM</strong> الإعلامية</span>
-      <span id="sidebar-domain-label" dir="ltr">hujariyapress.rawi-ye.com</span>
-    </div>
-  </aside>
+.weather-strip-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-  <!-- =====================================================================
-       7. مساحة المحتوى الإخباري الرئيسية
-       ===================================================================== -->
-  <main class="pub-container main-workspace">
+.weather-strip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
 
-    <!-- المساحة الإعلانية العلوية -->
-    <div id="ad-slot-top" class="ad-slot-container hidden"></div>
+.weather-strip-badge .material-symbols-rounded {
+  font-size: 15px;
+  color: #fbbf24;
+}
 
-    <!-- شريط عنوان القسم أو الفلتر المفتوح حالياً -->
-    <div id="active-filter-banner" class="active-filter-banner hidden">
-      <div class="filter-banner-info">
-        <span class="bbc-red-mark"></span>
-        <strong id="active-filter-title">نتائج العرض</strong>
-      </div>
-      <button type="button" id="reset-all-filters-btn" class="btn-clean-reset">
-        <span class="material-symbols-rounded" translate="no">arrow_forward</span>
-        <span>العودة للرئيسية</span>
-      </button>
-    </div>
+/* ==================== 2. الهيدر النظيف مع دعم كامل للشعار الشفاف المفرغ ==================== */
+.bbc-clean-header {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
 
-    <!-- =================================================================
-         (أ) واجهة الصفحة الرئيسية وصفحات الأقسام
-         ================================================================= -->
-    <div id="view-home" class="app-view">
+.header-main-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+}
 
-      <!-- التغطية الرئيسية البارزة (Hero Story) -->
-      <section id="hero-featured-section" class="hero-featured-section">
-        <div id="hero-featured-box" class="bbc-lead-story-slot">
-          <div class="skeleton-box hero-skeleton">جاري تحميل التغطية الرئيسية...</div>
-        </div>
-      </section>
+.header-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: rgba(0, 0, 0, 0.16);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  padding: 6px 11px;
+  border-radius: 4px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
 
-      <!-- شريط موجز الأخبار السريعة -->
-      <section id="quick-pulse-strip-section" class="quick-pulse-strip-section" aria-label="موجز الأخبار السريعة">
-        <div class="pulse-strip-header">
-          <div class="pulse-header-right">
-            <span class="material-symbols-rounded pulse-icon" translate="no">bolt</span>
-            <h2>موجز الأخبار السريعة</h2>
-          </div>
-          <button type="button" id="view-all-pulse-btn" class="pulse-more-btn">عرض الكل</button>
-        </div>
-        <div id="quick-pulse-feed" class="pulse-horizontal-cards">
-          <div class="empty-state-msg">جاري تحميل الموجز...</div>
-        </div>
-      </section>
+.header-menu-btn:hover {
+  background-color: rgba(0, 0, 0, 0.28);
+}
 
-      <!-- شريط الفيديوهات القصيرة والمرئيات (BBC Shorts / Reels 9:16) -->
-      <section id="shorts-reels-section" class="shorts-reels-section hidden" aria-label="الفيديوهات القصيرة والمرئيات">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
-          <span class="material-symbols-rounded" style="color:var(--brand-red);font-size:20px;" translate="no">smart_display</span>
-          <h2>الفيديوهات القصيرة والمرئيات</h2>
-          <button type="button" id="view-all-shorts-btn" class="pulse-more-btn" style="margin-right:auto;">كل المرئيات</button>
-        </div>
-        <div id="shorts-horizontal-list" class="shorts-horizontal-row"></div>
-      </section>
+.header-menu-btn .material-symbols-rounded {
+  font-size: 21px;
+}
 
-      <!-- المساحة الإعلانية الوسطى -->
-      <div id="ad-slot-middle" class="ad-slot-container hidden"></div>
+.header-brand-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #ffffff;
+  background: transparent !important;
+  flex-shrink: 0;
+  min-width: 0;
+}
 
-      <!-- شبكة الأخبار والتقارير والتحليلات -->
-      <section class="bbc-news-section" aria-label="أحدث الأخبار والتقارير">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
-          <h2 id="feed-section-heading">أحدث الأخبار والتقارير</h2>
-          <span id="feed-posts-counter" class="feed-count-text"></span>
-        </div>
+.header-logo-img {
+  max-height: 44px;
+  width: auto;
+  object-fit: contain;
+  background: transparent !important;
+}
 
-        <div id="public-posts-grid" class="bbc-news-grid">
-          <div class="skeleton-box"></div>
-          <div class="skeleton-box"></div>
-          <div class="skeleton-box"></div>
-        </div>
+.header-brand-text {
+  font-size: 1.48rem;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
 
-        <div id="load-more-wrap" class="load-more-wrap hidden">
-          <button type="button" id="load-more-posts-btn" class="btn-load-more">
-            <span>عرض المزيد من الأخبار</span>
-            <span class="material-symbols-rounded" translate="no">expand_more</span>
-          </button>
-        </div>
-      </section>
+.header-search-form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 210px;
+  max-width: 42vw;
+  flex-shrink: 1;
+}
 
-      <!-- زاوية كُتّاب وأقلام «حُجرية بريس» -->
-      <section id="writers-strip-section" class="bbc-writers-section hidden" aria-label="أقلام وكُتّاب حُجرية بريس">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
-          <h2>أقلام وكُتّاب حُجرية بريس</h2>
-        </div>
-        <div id="writers-horizontal-list" class="writers-clean-row"></div>
-      </section>
+.header-search-form input {
+  width: 100%;
+  height: 35px;
+  padding: 4px 30px 4px 26px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.96);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 700;
+  outline: none;
+}
 
-    </div>
+.header-search-form input::placeholder {
+  color: var(--text-muted);
+}
 
-    <!-- =================================================================
-         (ب) واجهة قراءة الخبر الكامل (مع البنية التحتية للصور المدمجة بين الفقرات)
-         ================================================================= -->
-    <article id="view-article" class="app-view hidden">
-      <div class="article-top-nav">
-        <button type="button" id="back-from-article-btn" class="btn-back-clean">
-          <span class="material-symbols-rounded" translate="no">arrow_forward</span>
-          <span>العودة للأخبار</span>
-        </button>
+.header-search-form .search-icon {
+  position: absolute;
+  right: 7px;
+  font-size: 18px;
+  color: var(--brand-red);
+  pointer-events: none;
+}
 
-        <!-- شريط تصنيفات المقال الأفقي المتحرك المعزول ضد التمدد -->
-        <div id="article-categories-badges" class="horizontal-tags-scroll"></div>
-      </div>
+.clear-search-btn {
+  position: absolute;
+  left: 5px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+}
 
-      <div class="bbc-article-sheet">
-        <h1 id="reader-article-title" class="article-main-headline"></h1>
+/* ==================== 3. شريط مؤشرات الأسواق العالمية والعملات ==================== */
+.markets-strip-bar {
+  background-color: #1f2024;
+  color: #f4f4f5;
+  height: 29px;
+  font-size: 0.74rem;
+  border-bottom: 1px solid #2e3036;
+  overflow: hidden;
+  width: 100%;
+}
 
-        <!-- الملخص الإخباري (الزبدة) -->
-        <p id="reader-article-summary" class="article-lead-summary hidden"></p>
+.markets-strip-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        <!-- شريط معلومات الكاتب والوقت + زر المشاركة الموحد -->
-        <div class="article-byline-bar">
-          <div id="reader-author-box" class="byline-author-info" role="button" tabindex="0">
-            <img id="reader-author-avatar" src="" alt="" class="byline-avatar">
-            <div class="byline-text">
-              <div class="byline-name-row">
-                <strong id="reader-author-name"></strong>
-                <span id="reader-author-verified" class="material-symbols-rounded verified-icon hidden" translate="no">verified</span>
-              </div>
-              <time id="reader-publish-date" class="byline-time"></time>
-            </div>
-          </div>
+.markets-strip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+}
 
-          <button type="button" id="unified-share-btn" class="btn-unified-share" title="مشاركة الخبر مع الصورة والملخص والرابط">
-            <span class="material-symbols-rounded" translate="no">share</span>
-            <span id="unified-share-label">مشاركة</span>
-          </button>
-        </div>
+.markets-strip-badge .material-symbols-rounded {
+  font-size: 15px;
+  color: #38bdf8;
+}
 
-        <!-- مشغل الفيديو الذكي (عمودي 9:16 أو عريض 16:9) -->
-        <div id="reader-video-box" class="article-video-embed hidden"></div>
+.m-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 700;
+}
 
-        <!-- صورة المقال البارزة الرئيسية -->
-        <figure id="reader-media-figure" class="article-main-figure"></figure>
+.m-item strong {
+  color: #ffffff;
+  font-weight: 800;
+}
 
-        <!-- النص الكامل للخبر (مهيأ بالكامل لعرض الصور المتعددة بين الفقرات + الروابط والمصادر) -->
-        <div id="reader-article-content" class="article-body-prose"></div>
+.m-up {
+  color: #4ade80;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 0.7rem;
+}
 
-        <!-- شريط مشاركة سفلي موحد -->
-        <div class="article-bottom-share">
-          <span>شارك هذا الخبر مع الآخرين:</span>
-          <button type="button" id="unified-share-bottom-btn" class="btn-unified-share">
-            <span class="material-symbols-rounded" translate="no">share</span>
-            <span id="unified-share-bottom-label">مشاركة الخبر</span>
-          </button>
-        </div>
+.m-down {
+  color: #f87171;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 0.7rem;
+}
 
-        <!-- شريط الوسوم الأفقي المتحرك (بحد أقصى 3 وسوم) -->
-        <div id="reader-tags-box" class="horizontal-tags-scroll article-tags-margin hidden"></div>
-      </div>
+/* ==================== 4. شريط الأقسام الكلاسيكي النظيف ==================== */
+.bbc-categories-bar {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+}
 
-      <!-- أخبار وتقارير ذات صلة -->
-      <section class="bbc-news-section">
-        <div class="bbc-block-header">
-          <span class="bbc-red-mark"></span>
-          <h2>أخبار وتقارير ذات صلة</h2>
-        </div>
-        <div id="related-posts-grid" class="bbc-news-grid"></div>
-      </section>
-    </article>
+.categories-scroll-row {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
 
-    <!-- =================================================================
-         (ج) واجهة صفحة الكاتب وأرشيف مقالاته
-         ================================================================= -->
-    <section id="view-author" class="app-view hidden">
-      <div class="article-top-nav">
-        <button type="button" id="back-from-author-btn" class="btn-back-clean">
-          <span class="material-symbols-rounded" translate="no">arrow_forward</span>
-          <span>العودة للرئيسية</span>
-        </button>
-      </div>
+.categories-scroll-row::-webkit-scrollbar {
+  display: none;
+}
 
-      <div class="author-clean-header">
-        <img id="author-view-avatar" src="" alt="" class="author-clean-avatar">
-        <div class="author-clean-meta">
-          <div class="author-clean-name-row">
-            <h1 id="author-view-name"></h1>
-            <span id="author-view-verified" class="material-symbols-rounded verified-icon hidden" translate="no">verified</span>
-          </div>
-          <span id="author-view-job" class="author-clean-role"></span>
-          <p id="author-view-bio" class="author-clean-bio"></p>
-        </div>
-      </div>
+.cat-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-body);
+  white-space: nowrap;
+  position: relative;
+  flex-shrink: 0;
+}
 
-      <div class="bbc-block-header" style="margin-top: 22px;">
-        <span class="bbc-red-mark"></span>
-        <h2 id="author-articles-heading">مقالات الكاتب</h2>
-      </div>
-      <div id="author-posts-grid" class="bbc-news-grid"></div>
-    </section>
+.cat-tab-btn:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 28%;
+  height: 44%;
+  width: 1px;
+  background-color: var(--border-light);
+}
 
-    <!-- =================================================================
-         (د) واجهة الصفحات المؤسسية الثابتة (من نحن، الميثاق، الخصوصية)
-         ================================================================= -->
-    <section id="view-static-page" class="app-view hidden">
-      <div class="article-top-nav">
-        <button type="button" id="back-from-static-btn" class="btn-back-clean">
-          <span class="material-symbols-rounded" translate="no">arrow_forward</span>
-          <span>العودة للرئيسية</span>
-        </button>
-      </div>
+.cat-tab-btn.active,
+.cat-tab-btn:hover {
+  color: var(--brand-red);
+  border-bottom-color: var(--brand-red);
+}
 
-      <div class="bbc-article-sheet">
-        <h1 id="static-page-title" class="article-main-headline"></h1>
-        <div id="static-page-body" class="article-body-prose"></div>
-      </div>
-    </section>
+/* شريط التصنيفات الفرعية */
+.subcategories-bar-wrap {
+  background-color: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-light);
+  padding: 6px 0;
+  width: 100%;
+}
 
-  </main>
+.subcategories-scroll-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
 
-  <!-- =====================================================================
-       8. عارض الصور المكبر (Lightbox) للصور المدمجة داخل المقالات
-       ===================================================================== -->
-  <div id="inline-image-lightbox" class="image-lightbox-modal hidden" role="dialog" aria-label="عرض الصورة بحجم كامل">
-    <button type="button" id="close-lightbox-btn" class="lightbox-close-btn" aria-label="إغلاق">
-      <span class="material-symbols-rounded" translate="no">close</span>
-    </button>
-    <div class="lightbox-content-wrap">
-      <img id="lightbox-full-img" src="" alt="">
-      <p id="lightbox-caption-text" class="lightbox-caption hidden"></p>
-    </div>
-  </div>
+.subcategories-scroll-row::-webkit-scrollbar {
+  display: none;
+}
 
-  <!-- =====================================================================
-       9. التذييل المؤسسي النظيف (Footer)
-       ===================================================================== -->
-  <footer class="bbc-clean-footer">
-    <div class="pub-container">
-      <div class="footer-top-row">
-        <div class="footer-brand-info">
-          <img id="footer-logo-img" src="" alt="حُجرية بريس" class="footer-logo-img hidden">
-          <strong id="footer-site-name" class="footer-title">حُجرية بريس</strong>
-          <p id="footer-site-desc" class="footer-desc">
-            منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.
-          </p>
-          <div id="footer-social-links" class="footer-socials-row"></div>
-        </div>
+.subcat-chip {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-med);
+  color: var(--text-body);
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
-        <div class="footer-quick-links">
-          <button type="button" class="footer-link-btn" data-open-page="about">من نحن</button>
-          <button type="button" class="footer-link-btn" data-open-page="charter">ميثاق الشرف</button>
-          <button type="button" class="footer-link-btn" data-open-page="privacy">سياسة الخصوصية</button>
-        </div>
-      </div>
+.subcat-chip.active {
+  background-color: var(--brand-red);
+  border-color: var(--brand-red);
+  color: #ffffff;
+}
 
-      <div class="footer-bottom-row">
-        <span>© جميع الحقوق محفوظة لـ <strong id="copyright-site-name">حُجرية بريس</strong> — مؤسسة <strong>RAWI-YE.COM</strong></span>
-        <span id="footer-domain-label" dir="ltr">hujariyapress.rawi-ye.com</span>
-      </div>
-    </div>
-  </footer>
+/* ==================== 5. شريط الأخبار العاجلة التلفزيوني المتحرك ==================== */
+.tv-breaking-bar {
+  background-color: var(--breaking-red);
+  color: #ffffff;
+  height: 36px;
+  border-bottom: 1px solid #7f1d1d;
+  overflow: hidden;
+  width: 100%;
+}
 
-  <!-- إشعار التفاعل السريع (Toast) -->
-  <div id="pub-toast" class="pub-toast hidden" role="status" aria-live="polite"></div>
+.tv-breaking-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  <!-- المحرك البرمجي للموقع العام (حُجرية بريس) -->
-  <script type="module" src="./app.js"></script>
-</body>
-</html>
+.tv-breaking-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  color: var(--breaking-red);
+  padding: 2px 9px;
+  border-radius: 2px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--brand-red);
+  animation: pulseBlink 1s infinite;
+}
+
+@keyframes pulseBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.tv-ticker-item {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tv-ticker-item:hover {
+  text-decoration: underline;
+}
+
+/* ==================== 6. القائمة الجانبية الشاملة ==================== */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 120;
+}
+
+.master-sidebar-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 310px;
+  max-width: 86vw;
+  background-color: var(--bg-card);
+  border-left: 1px solid var(--border-light);
+  z-index: 130;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -6px 0 24px rgba(0, 0, 0, 0.16);
+}
+
+.sidebar-drawer-header {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-logo-img {
+  max-height: 32px;
+  width: auto;
+  background: transparent !important;
+}
+
+.sidebar-brand-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.sidebar-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.15);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-block-title {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--text-muted);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 2px;
+}
+
+.sidebar-page-link {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.sidebar-page-link .material-symbols-rounded {
+  color: var(--brand-red);
+  font-size: 19px;
+}
+
+.sidebar-page-link:hover,
+.sidebar-page-link.active {
+  border-color: var(--brand-red);
+  color: var(--brand-red);
+  background-color: #ffffff;
+}
+
+.sidebar-direct-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.sidebar-cat-direct-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-right: 3px solid var(--brand-red);
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  text-align: right;
+}
+
+.sidebar-cat-direct-btn:hover {
+  background-color: var(--brand-red);
+  color: #ffffff;
+}
+
+.sidebar-writers-list,
+.sidebar-pages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sidebar-writer-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  text-align: right;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.sidebar-writer-btn img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar-socials-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sidebar-socials-grid a {
+  padding: 6px 11px;
+  border-radius: 3px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.sidebar-socials-grid a:hover {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  border-color: var(--brand-red);
+}
+
+.sidebar-drawer-footer {
+  padding: 10px 14px;
+  background-color: var(--bg-page);
+  border-top: 1px solid var(--border-light);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ==================== 7. تصنيفات البطاقات (أول تصنيفين فقط) + تصنيفات داخل المقال ==================== */
+
+/* في بطاقات الصفحة الرئيسية: عرض أول تصنيفين فقط بشكل أنيق ومحصّن 100% ضد التمدد */
+.card-categories-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+/* داخل صفحة قراءة المقال: شريط تصنيفات محكوم لا يكسر عرض الصفحة أبداً */
+.horizontal-tags-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.card-cat-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 2px;
+  background-color: rgba(239, 51, 39, 0.1);
+  color: var(--brand-red);
+  font-size: 0.72rem;
+  font-weight: 800;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-subcat-pill {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background-color: var(--bg-subtle);
+  color: var(--text-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-more-cats-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.card-video-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  background-color: #141417;
+  color: #ffffff;
+  font-size: 0.69rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* ==================== 8. الخبر الرئيسي، النبض، وشريط الفيديوهات القصيرة ==================== */
+.main-workspace {
+  padding-top: 16px;
+  padding-bottom: 36px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.app-view {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.bbc-block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bbc-red-mark {
+  width: 5px;
+  height: 18px;
+  background-color: var(--brand-red);
+  flex-shrink: 0;
+}
+
+.bbc-block-header h2 {
+  font-size: 1.08rem;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.feed-count-text {
+  margin-right: auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* الخبر الرئيسي البارز */
+.hero-featured-section {
+  margin-bottom: 18px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.bbc-lead-story-slot {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.lead-story-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.lead-story-media {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  max-height: 360px;
+  min-width: 0;
+  background-color: var(--bg-subtle);
+  overflow: hidden;
+  position: relative;
+}
+
+.lead-story-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: transparent;
+}
+
+.lead-story-body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.lead-story-body > div {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.lead-story-title {
+  font-size: 1.42rem;
+  font-weight: 900;
+  line-height: 1.38;
+  color: var(--text-main);
+  margin: 6px 0 10px;
+  overflow-wrap: break-word;
+}
+
+.lead-story-card:hover .lead-story-title {
+  color: var(--brand-red);
+}
+
+.lead-story-summary {
+  font-size: 0.92rem;
+  color: var(--text-body);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+.card-clean-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light);
+  min-width: 0;
+}
+
+.card-author-name {
+  font-weight: 800;
+  color: var(--text-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.verified-icon {
+  color: var(--verified-blue) !important;
+  font-size: 15px !important;
+  flex-shrink: 0;
+}
+
+/* شريط موجز الأخبار السريعة */
+.quick-pulse-strip-section {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-right: 4px solid var(--brand-red);
+  padding: 12px 14px;
+  margin-bottom: 22px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.pulse-strip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pulse-header-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pulse-icon {
+  color: var(--brand-red);
+  font-size: 20px;
+}
+
+.pulse-header-right h2 {
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.pulse-more-btn {
+  background: var(--bg-page);
+  border: 1px solid var(--border-light);
+  padding: 2px 9px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--brand-red);
+  border-radius: 3px;
+}
+
+.pulse-horizontal-cards {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+  max-width: 100%;
+}
+
+.pulse-horizontal-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.pulse-mini-card {
+  min-width: 245px;
+  max-width: 270px;
+  padding: 8px 11px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pulse-mini-card:hover .brief-item-title {
+  color: var(--brand-red);
+}
+
+.brief-item-time {
+  font-size: 0.69rem;
+  font-weight: 800;
+  color: var(--brand-red);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.brief-item-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* شريط الفيديوهات القصيرة العمودية (BBC Shorts / Reels 9:16) */
+.shorts-reels-section {
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.shorts-horizontal-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  max-width: 100%;
+}
+
+.shorts-horizontal-row::-webkit-scrollbar {
+  display: none;
+}
+
+.short-reel-card {
+  width: 175px;
+  aspect-ratio: 9 / 15;
+  background-color: var(--brand-red);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.short-reel-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+
+.short-reel-card:hover img {
+  transform: scale(1.04);
+}
+
+.short-reel-overlay {
+  position: relative;
+  z-index: 2;
+  padding: 28px 10px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.45) 65%, transparent 100%);
+  color: #ffffff;
+}
+
+.short-play-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  background-color: rgba(239, 51, 39, 0.92);
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.short-reel-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #ffffff;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==================== 9. شبكة بطاقات الأخبار المرتبة بالمسطرة ==================== */
+.bbc-news-section {
+  margin-bottom: 26px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.bbc-news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.bbc-news-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.bbc-news-card:hover {
+  border-color: var(--border-med);
+}
+
+.bbc-news-card:hover .bbc-card-title {
+  color: var(--brand-red);
+}
+
+.bbc-card-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: var(--bg-subtle);
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-light);
+  position: relative;
+}
+
+.bbc-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: transparent;
+}
+
+.brand-fallback-thumb {
+  width: 100%;
+  height: 100%;
+  background-color: var(--brand-red);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  text-align: center;
+}
+
+.brand-fallback-thumb img {
+  max-height: 52px;
+  width: auto;
+  object-fit: contain;
+  background: transparent !important;
+}
+
+.brand-fallback-name {
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.bbc-card-content {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.bbc-card-content > div {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.bbc-card-title {
+  font-size: 0.98rem;
+  font-weight: 900;
+  line-height: 1.42;
+  color: var(--text-main);
+  margin: 6px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+.bbc-card-excerpt {
+  font-size: 0.82rem;
+  color: var(--text-body);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+/* ==================== 10. قارئ المقال + البنية التحتية للصور المدمجة بين الفقرات ==================== */
+.bbc-writers-section {
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.writers-clean-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.writers-clean-row::-webkit-scrollbar {
+  display: none;
+}
+
+.writer-clean-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  min-width: 210px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.writer-clean-card img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.writer-clean-name {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.writer-clean-role {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.article-top-nav {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.btn-back-clean {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-med);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.bbc-article-sheet {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  padding: 20px;
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.article-main-headline {
+  font-size: 1.55rem;
+  font-weight: 900;
+  line-height: 1.38;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  overflow-wrap: break-word;
+}
+
+.article-lead-summary {
+  padding: 10px 14px;
+  background-color: var(--bg-page);
+  border-right: 3px solid var(--brand-red);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-body);
+  margin-bottom: 14px;
+  overflow-wrap: break-word;
+}
+
+.article-byline-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 0;
+  margin-bottom: 16px;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.byline-author-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+.byline-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.byline-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.88rem;
+}
+
+.byline-time {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.btn-unified-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--brand-red);
+  background-color: var(--brand-red);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.btn-unified-share:hover {
+  background-color: var(--brand-red-dark);
+}
+
+.btn-unified-share .material-symbols-rounded {
+  font-size: 18px;
+}
+
+.article-main-figure {
+  margin-bottom: 18px;
+  background-color: transparent;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.article-main-figure img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.article-video-embed {
+  margin-bottom: 18px;
+  width: 100%;
+}
+
+.video-frame-landscape {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  background-color: #000000;
+  border: 1px solid var(--border-light);
+}
+
+.video-frame-landscape iframe,
+.video-frame-landscape video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-frame-vertical {
+  max-width: 350px;
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  background-color: #000000;
+  border: 2px solid var(--brand-red);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.video-frame-vertical iframe,
+.video-frame-vertical video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* البنية التحتية لنص المقال والصور المتعددة المدمجة بين الفقرات */
+.article-body-prose {
+  font-size: 1.04rem;
+  line-height: 1.9;
+  color: var(--text-main);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.article-body-prose p {
+  margin-bottom: 14px;
+}
+
+.article-body-prose h2,
+.article-body-prose h3 {
+  margin: 22px 0 10px;
+  padding-right: 8px;
+  border-right: 3px solid var(--brand-red);
+  font-weight: 900;
+}
+
+.article-body-prose blockquote {
+  margin: 16px 0;
+  padding: 12px 14px;
+  background-color: var(--bg-page);
+  border-right: 3px solid var(--brand-red);
+  font-weight: 700;
+}
+
+.article-body-prose ul,
+.article-body-prose ol {
+  margin: 10px 22px 14px 0;
+}
+
+.article-body-prose img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 520px;
+  height: auto;
+  margin: 18px auto;
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  background-color: transparent;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+.article-body-prose figure,
+.article-body-prose .inline-article-figure {
+  margin: 20px auto;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.article-body-prose figure img,
+.article-body-prose .inline-article-figure img {
+  margin: 0 auto;
+  border: none;
+  border-radius: 0;
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+}
+
+.article-body-prose figcaption {
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-light);
+  background-color: var(--bg-page);
+  text-align: right;
+}
+
+.article-body-prose a {
+  color: var(--brand-red);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0 3px;
+  border-radius: 2px;
+  background-color: rgba(239, 51, 39, 0.06);
+  word-break: break-all;
+}
+
+.article-body-prose a:hover {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.article-bottom-share {
+  margin-top: 20px;
+  padding: 12px 14px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.article-tags-margin {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-light);
+}
+
+.tag-chip {
+  padding: 3px 10px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  color: var(--text-body);
+  font-size: 0.76rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.inline-hashtag {
+  color: var(--brand-red);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* عارض الصور المكبر (Lightbox) */
+.image-lightbox-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.88);
+  z-index: 260;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--brand-red);
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-content-wrap {
+  max-width: 94vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.lightbox-content-wrap img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lightbox-caption {
+  color: #f4f4f5;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* صفحة الكاتب */
+.author-clean-header {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.author-clean-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--brand-red);
+}
+
+.author-clean-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.author-clean-role {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--brand-red);
+}
+
+.author-clean-bio {
+  font-size: 0.86rem;
+  color: var(--text-body);
+  margin-top: 4px;
+}
+
+/* عناصر التصفية والإعلانات */
+.active-filter-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.filter-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-clean-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-med);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.load-more-wrap {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.btn-load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-med);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.ad-slot-container {
+  margin-bottom: 18px;
+}
+
+.ad-banner-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  text-decoration: none;
+  color: var(--text-main);
+}
+
+.ad-banner-card img {
+  max-height: 70px;
+  object-fit: contain;
+  background: transparent;
+}
+
+/* ==================== 11. التذييل النظيف ==================== */
+.bbc-clean-footer {
+  background-color: #18181b;
+  color: #d4d4d8;
+  border-top: 3px solid var(--brand-red);
+  padding: 24px 0 18px;
+  margin-top: 36px;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.footer-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #27272a;
+}
+
+.footer-logo-img {
+  max-height: 38px;
+  width: auto;
+  margin-bottom: 6px;
+  background: transparent !important;
+}
+
+.footer-title {
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  display: block;
+}
+
+.footer-desc {
+  color: #a1a1aa;
+  max-width: 520px;
+  margin-top: 4px;
+}
+
+.footer-socials-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.footer-socials-row a {
+  padding: 3px 9px;
+  background-color: #27272a;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 3px;
+}
+
+.footer-socials-row a:hover {
+  background-color: var(--brand-red);
+}
+
+.footer-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-link-btn {
+  background: transparent;
+  border: none;
+  color: #e4e4e7;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.footer-bottom-row {
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #a1a1aa;
+  font-size: 0.74rem;
+}
+
+.pub-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #18181b;
+  color: #ffffff;
+  border-right: 3px solid var(--brand-red);
+  padding: 9px 16px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  z-index: 200;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.skeleton-box {
+  height: 220px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.hero-skeleton {
+  height: 300px;
+}
+
+/* توافق الشاشات الصغيرة والجوال */
+@media (max-width: 860px) {
+  .lead-story-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lead-story-media {
+    min-height: 210px;
+  }
+}
+
+@media (max-width: 640px) {
+  .menu-btn-label {
+    display: none;
+  }
+  .header-brand-text {
+    font-size: 1.24rem;
+  }
+  .header-logo-img {
+    max-height: 36px;
+  }
+  .header-search-form {
+    width: 140px;
+  }
+  .bbc-article-sheet {
+    padding: 14px;
+  }
+  .article-main-headline {
+    font-size: 1.28rem;
+  }
+  .lead-story-title {
+    font-size: 1.16rem;
+  }
+  .lead-story-body {
+    padding: 14px;
+  }
+  .short-reel-card {
+    width: 150px;
+  }
+}
