@@ -14,7 +14,7 @@
   <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23ef3327%22/><text x=%2250%%22 y=%2258%%22 font-size=%2264%22 fill=%22%23ffffff%22 font-family=%22Cairo,sans-serif%22 font-weight=%22900%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>ح</text></svg>">
   <link rel="apple-touch-icon" id="dynamic-apple-icon" href="">
 
-  <!-- وسوم المشاركة الذكية (Open Graph) -->
+  <!-- وسوم المشاركة الذكية (Open Graph & Twitter Cards) -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="حُجرية بريس | Hujariya Press">
   <meta property="og:title" id="og-meta-title" content="حُجرية بريس | Hujariya Press">
@@ -131,7 +131,7 @@
   </div>
 
   <!-- =====================================================================
-       5. شريط الأخبار العاجلة التلفزيوني المتحرك (يمر بلا نهاية ولا يضخم الصفحة)
+       5. شريط الأخبار العاجلة التلفزيوني المتحرك
        ===================================================================== -->
   <section id="breaking-news-bar" class="tv-breaking-bar hidden" aria-label="أخبار عاجلة">
     <div class="pub-container tv-breaking-inner">
@@ -161,7 +161,6 @@
     </div>
 
     <div class="sidebar-drawer-body">
-      <!-- انتقال مباشر للرئيسية والنبض السريع والفيديوهات القصيرة -->
       <div class="sidebar-section-block">
         <button type="button" id="sidebar-home-btn" class="sidebar-page-link active">
           <span class="material-symbols-rounded" translate="no">home</span>
@@ -177,7 +176,7 @@
         </button>
       </div>
 
-      <!-- أقسام الموقع: الضغط على أي قسم يفتح صفحته مباشرة -->
+      <!-- أقسام الموقع المباشرة -->
       <div class="sidebar-section-block">
         <span class="sidebar-block-title">أقسام حُجرية بريس</span>
         <div id="sidebar-categories-direct-list" class="sidebar-direct-grid"></div>
@@ -208,7 +207,7 @@
         </div>
       </div>
 
-      <!-- منصات التواصل الاجتماعي (تظهر فقط المنصات المضاف لها رابط في الإعدادات) -->
+      <!-- منصات التواصل الاجتماعي -->
       <div id="sidebar-socials-wrap" class="sidebar-section-block hidden">
         <span class="sidebar-block-title">تابعنا على منصات التواصل</span>
         <div id="sidebar-social-links" class="sidebar-socials-grid"></div>
@@ -222,11 +221,11 @@
   </aside>
 
   <!-- =====================================================================
-       7. مساحة المحتوى الإخباري الرئيسية (واجهة BBC الكلاسيكية النظيفة)
+       7. مساحة المحتوى الإخباري الرئيسية
        ===================================================================== -->
   <main class="pub-container main-workspace">
 
-    <!-- المساحة الإعلانية العلوية (تظهر فقط عند تفعيل إعلان) -->
+    <!-- المساحة الإعلانية العلوية -->
     <div id="ad-slot-top" class="ad-slot-container hidden"></div>
 
     <!-- شريط عنوان القسم أو الفلتر المفتوح حالياً -->
@@ -253,7 +252,7 @@
         </div>
       </section>
 
-      <!-- شريط موجز الأخبار السريعة الأنيق والمدمج -->
+      <!-- شريط موجز الأخبار السريعة -->
       <section id="quick-pulse-strip-section" class="quick-pulse-strip-section" aria-label="موجز الأخبار السريعة">
         <div class="pulse-strip-header">
           <div class="pulse-header-right">
@@ -267,7 +266,7 @@
         </div>
       </section>
 
-      <!-- شريط الفيديوهات القصيرة والمرئيات (BBC Shorts / Reels 9:16) — يظهر تلقائياً عند وجود فيديوهات -->
+      <!-- شريط الفيديوهات القصيرة والمرئيات (BBC Shorts / Reels 9:16) -->
       <section id="shorts-reels-section" class="shorts-reels-section hidden" aria-label="الفيديوهات القصيرة والمرئيات">
         <div class="bbc-block-header">
           <span class="bbc-red-mark"></span>
@@ -315,7 +314,7 @@
     </div>
 
     <!-- =================================================================
-         (ب) واجهة قراءة الخبر الكامل (مع دعم الفيديوهات القصيرة والعريضة والروابط الآمنة)
+         (ب) واجهة قراءة الخبر الكامل (مع البنية التحتية للصور المدمجة بين الفقرات)
          ================================================================= -->
     <article id="view-article" class="app-view hidden">
       <div class="article-top-nav">
@@ -324,7 +323,7 @@
           <span>العودة للأخبار</span>
         </button>
 
-        <!-- شريط تصنيفات المقال الأفقي المتحرك -->
+        <!-- شريط تصنيفات المقال الأفقي المتحرك المعزول ضد التمدد -->
         <div id="article-categories-badges" class="horizontal-tags-scroll"></div>
       </div>
 
@@ -334,7 +333,7 @@
         <!-- الملخص الإخباري (الزبدة) -->
         <p id="reader-article-summary" class="article-lead-summary hidden"></p>
 
-        <!-- شريط معلومات الكاتب والوقت + زر المشاركة الموحد الذي يشارك الصورة والملخص والرابط -->
+        <!-- شريط معلومات الكاتب والوقت + زر المشاركة الموحد -->
         <div class="article-byline-bar">
           <div id="reader-author-box" class="byline-author-info" role="button" tabindex="0">
             <img id="reader-author-avatar" src="" alt="" class="byline-avatar">
@@ -353,13 +352,13 @@
           </button>
         </div>
 
-        <!-- مشغل الفيديو الذكي (يتكيف تلقائياً: عمودي 9:16 للفيديوهات القصيرة أو عريض 16:9) -->
+        <!-- مشغل الفيديو الذكي (عمودي 9:16 أو عريض 16:9) -->
         <div id="reader-video-box" class="article-video-embed hidden"></div>
 
-        <!-- صورة المقال البارزة (أو الصورة الافتراضية للهوية بدون خلفية سوداء) -->
+        <!-- صورة المقال البارزة الرئيسية -->
         <figure id="reader-media-figure" class="article-main-figure"></figure>
 
-        <!-- النص الكامل للخبر (مع دعم كامل وآمن للروابط والمصادر والهاشتاجات) -->
+        <!-- النص الكامل للخبر (مهيأ بالكامل لعرض الصور المتعددة بين الفقرات + الروابط والمصادر) -->
         <div id="reader-article-content" class="article-body-prose"></div>
 
         <!-- شريط مشاركة سفلي موحد -->
@@ -435,7 +434,20 @@
   </main>
 
   <!-- =====================================================================
-       8. التذييل المؤسسي النظيف (Footer)
+       8. عارض الصور المكبر (Lightbox) للصور المدمجة داخل المقالات
+       ===================================================================== -->
+  <div id="inline-image-lightbox" class="image-lightbox-modal hidden" role="dialog" aria-label="عرض الصورة بحجم كامل">
+    <button type="button" id="close-lightbox-btn" class="lightbox-close-btn" aria-label="إغلاق">
+      <span class="material-symbols-rounded" translate="no">close</span>
+    </button>
+    <div class="lightbox-content-wrap">
+      <img id="lightbox-full-img" src="" alt="">
+      <p id="lightbox-caption-text" class="lightbox-caption hidden"></p>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       9. التذييل المؤسسي النظيف (Footer)
        ===================================================================== -->
   <footer class="bbc-clean-footer">
     <div class="pub-container">
