@@ -1,9 +1,9 @@
 /* ==========================================================================
    حُجرية بريس (Hujariya Press) — التصميم الكلاسيكي النظيف المستوحى من BBC News
-   النسخة المحصّنة:
-   1. منع تمدد وتشوه البطاقات في الجوال مهما بلغ عدد التصنيفات والوسوم
-   2. بنية تحتية متكاملة لعرض الصور المتعددة المدمجة بين فقرات المقال + عارض Lightbox
-   3. شفافية كاملة للشعار والصور المفرغة + دعم الفيديوهات القصيرة (9:16) والعريضة (16:9)
+   النسخة المحصّنة للجوال:
+   1. عرض أول تصنيفين فقط في بطاقات الصفحة الرئيسية لمنع تمدد وانكماش شاشة الجوال
+   2. قفل عرض المتصفح (overflow-x: clip) لمنع ظهور أي فراغ جانبي في الهواتف
+   3. دعم الصور المتعددة المدمجة بين فقرات المقال + عارض Lightbox + الفيديوهات (9:16 و 16:9)
    ========================================================================== */
 
 :root {
@@ -38,8 +38,10 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -49,8 +51,10 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   width: 100%;
-  max-width: 100vw;
+  max-width: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
+  position: relative;
 }
 
 img {
@@ -80,12 +84,14 @@ button:active {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 14px;
+  overflow-x: clip;
 }
 
 /* ==================== محرك الأشرطة التلفزيونية المتحركة (طقس / أسواق / عاجل) ==================== */
 .ticker-viewport {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   position: relative;
   height: 100%;
@@ -132,6 +138,7 @@ button:active {
   font-size: 0.73rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   overflow: hidden;
+  width: 100%;
 }
 
 .weather-strip-inner {
@@ -163,6 +170,7 @@ button:active {
   color: #ffffff;
   padding: 10px 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .header-main-row {
@@ -204,6 +212,7 @@ button:active {
   color: #ffffff;
   background: transparent !important;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .header-logo-img {
@@ -219,6 +228,7 @@ button:active {
   color: #ffffff;
   letter-spacing: -0.2px;
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 .header-search-form {
@@ -227,6 +237,7 @@ button:active {
   align-items: center;
   width: 210px;
   max-width: 42vw;
+  flex-shrink: 1;
 }
 
 .header-search-form input {
@@ -272,6 +283,7 @@ button:active {
   font-size: 0.74rem;
   border-bottom: 1px solid #2e3036;
   overflow: hidden;
+  width: 100%;
 }
 
 .markets-strip-inner {
@@ -330,6 +342,7 @@ button:active {
   position: sticky;
   top: 0;
   z-index: 40;
+  width: 100%;
 }
 
 .categories-scroll-row {
@@ -338,6 +351,7 @@ button:active {
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 .categories-scroll-row::-webkit-scrollbar {
@@ -378,6 +392,7 @@ button:active {
   background-color: var(--bg-subtle);
   border-bottom: 1px solid var(--border-light);
   padding: 6px 0;
+  width: 100%;
 }
 
 .subcategories-scroll-row {
@@ -387,6 +402,7 @@ button:active {
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 .subcategories-scroll-row::-webkit-scrollbar {
@@ -418,6 +434,7 @@ button:active {
   height: 36px;
   border-bottom: 1px solid #7f1d1d;
   overflow: hidden;
+  width: 100%;
 }
 
 .tv-breaking-inner {
@@ -668,25 +685,30 @@ button:active {
   justify-content: space-between;
 }
 
-/* ==================== 7. الحل الجذري لشريط التصنيفات والوسوم الأفقي المتحرك ==================== */
-.horizontal-tags-scroll {
+/* ==================== 7. تصنيفات البطاقات (أول تصنيفين فقط) + تصنيفات داخل المقال ==================== */
+
+/* في بطاقات الصفحة الرئيسية: عرض أول تصنيفين فقط بشكل أنيق ومحصّن 100% ضد التمدد */
+.card-categories-row {
   display: flex;
-  flex-wrap: nowrap !important;
+  flex-wrap: wrap;
   align-items: center;
   gap: 5px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+/* داخل صفحة قراءة المقال: شريط تصنيفات محكوم لا يكسر عرض الصفحة أبداً */
+.horizontal-tags-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding-bottom: 2px;
-}
-
-.horizontal-tags-scroll::-webkit-scrollbar {
-  display: none;
+  overflow: hidden;
 }
 
 .card-cat-pill {
@@ -697,7 +719,9 @@ button:active {
   color: var(--brand-red);
   font-size: 0.72rem;
   font-weight: 800;
-  flex-shrink: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -709,7 +733,21 @@ button:active {
   color: var(--text-body);
   font-size: 0.7rem;
   font-weight: 700;
-  flex-shrink: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-more-cats-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background-color: var(--bg-page);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
   white-space: nowrap;
 }
 
@@ -723,7 +761,6 @@ button:active {
   color: #ffffff;
   font-size: 0.69rem;
   font-weight: 800;
-  flex-shrink: 0;
   white-space: nowrap;
 }
 
@@ -731,8 +768,15 @@ button:active {
 .main-workspace {
   padding-top: 16px;
   padding-bottom: 36px;
+  width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.app-view {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .bbc-block-header {
@@ -764,7 +808,7 @@ button:active {
   color: var(--text-muted);
 }
 
-/* الخبر الرئيسي البارز (مع عزل الحجم min-width: 0 لمنع تمدد الجوال نهائياً) */
+/* الخبر الرئيسي البارز */
 .hero-featured-section {
   margin-bottom: 18px;
   width: 100%;
@@ -828,7 +872,7 @@ button:active {
   font-weight: 900;
   line-height: 1.38;
   color: var(--text-main);
-  margin: 8px 0 10px;
+  margin: 6px 0 10px;
   overflow-wrap: break-word;
 }
 
@@ -885,6 +929,7 @@ button:active {
   border-right: 4px solid var(--brand-red);
   padding: 12px 14px;
   margin-bottom: 22px;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
 }
@@ -929,6 +974,7 @@ button:active {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 2px;
+  max-width: 100%;
 }
 
 .pulse-horizontal-cards::-webkit-scrollbar {
@@ -971,6 +1017,7 @@ button:active {
 /* شريط الفيديوهات القصيرة العمودية (BBC Shorts / Reels 9:16) */
 .shorts-reels-section {
   margin-bottom: 24px;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
 }
@@ -982,6 +1029,7 @@ button:active {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
+  max-width: 100%;
 }
 
 .shorts-horizontal-row::-webkit-scrollbar {
@@ -1054,6 +1102,7 @@ button:active {
 /* ==================== 9. شبكة بطاقات الأخبار المرتبة بالمسطرة ==================== */
 .bbc-news-section {
   margin-bottom: 26px;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
 }
@@ -1171,6 +1220,7 @@ button:active {
 /* ==================== 10. قارئ المقال + البنية التحتية للصور المدمجة بين الفقرات ==================== */
 .bbc-writers-section {
   margin-bottom: 24px;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
 }
@@ -1182,6 +1232,7 @@ button:active {
   padding-bottom: 4px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 .writers-clean-row::-webkit-scrollbar {
@@ -1224,13 +1275,13 @@ button:active {
 
 .article-top-nav {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 12px;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
 }
 
 .btn-back-clean {
@@ -1251,6 +1302,7 @@ button:active {
   border: 1px solid var(--border-light);
   padding: 20px;
   margin-bottom: 24px;
+  width: 100%;
   max-width: 100%;
   overflow: hidden;
 }
@@ -1334,7 +1386,6 @@ button:active {
   font-size: 18px;
 }
 
-/* صورة المقال البارزة الرئيسية */
 .article-main-figure {
   margin-bottom: 18px;
   background-color: transparent;
@@ -1350,7 +1401,6 @@ button:active {
   cursor: zoom-in;
 }
 
-/* مشغل الفيديو الذكي */
 .article-video-embed {
   margin-bottom: 18px;
   width: 100%;
@@ -1391,7 +1441,7 @@ button:active {
   border: 0;
 }
 
-/* ==================== البنية التحتية لنص المقال والصور المتعددة المدمجة بين الفقرات ==================== */
+/* البنية التحتية لنص المقال والصور المتعددة المدمجة بين الفقرات */
 .article-body-prose {
   font-size: 1.04rem;
   line-height: 1.9;
@@ -1425,7 +1475,6 @@ button:active {
   margin: 10px 22px 14px 0;
 }
 
-/* تنسيق الصور المتعددة المدمجة بين فقرات المقال (Inline Article Images & Figures) */
 .article-body-prose img {
   display: block;
   width: auto;
@@ -1470,7 +1519,6 @@ button:active {
   text-align: right;
 }
 
-/* تنسيق الروابط والمصادر داخل المقال */
 .article-body-prose a {
   color: var(--brand-red);
   font-weight: 800;
@@ -1525,7 +1573,7 @@ button:active {
   cursor: pointer;
 }
 
-/* عارض الصور المكبر (Lightbox) عند النقر على أي صورة داخل المقال */
+/* عارض الصور المكبر (Lightbox) */
 .image-lightbox-modal {
   position: fixed;
   inset: 0;
@@ -1688,6 +1736,7 @@ button:active {
   padding: 24px 0 18px;
   margin-top: 36px;
   font-size: 0.8rem;
+  width: 100%;
 }
 
 .footer-top-row {
@@ -1796,7 +1845,7 @@ button:active {
   height: 300px;
 }
 
-/* توافق الشاشات الصغيرة والجوال مع حماية عرض البطاقات 100% */
+/* توافق الشاشات الصغيرة والجوال */
 @media (max-width: 860px) {
   .lead-story-card {
     grid-template-columns: minmax(0, 1fr);
@@ -1817,7 +1866,7 @@ button:active {
     max-height: 36px;
   }
   .header-search-form {
-    width: 146px;
+    width: 140px;
   }
   .bbc-article-sheet {
     padding: 14px;
