@@ -1,8 +1,11 @@
 /* ==========================================================================
-   حُجرية بريس (Hujariya Press) — المحرك البرمجي الكلاسيكي النظيف (النسخة المُصلحة بالكامل)
-   يشمل: الحماية الأمنية (XSS Sanitizer)، دعم الروابط والمصادر التلقائي،
-   الفيديوهات القصيرة (BBC Shorts 9:16) والعريضة (16:9)، الشعار المفرغ الشفاف،
-   إحصائيات ظهور ونقرات الإعلانات، وتقييد الوسوم بـ 3 وسوم كحد أقصى
+   حُجرية بريس (Hujariya Press) — المحرك البرمجي الكلاسيكي النظيف (الموقع العام)
+   النسخة المحصّنة الشاملة:
+   - دعم الصور المتعددة المدمجة بين فقرات المقال (Inline Images & Figures) + عارض Lightbox
+   - حماية شريط التصنيفات الأفقي في الجوال من كسر البطاقات أو الفتح الخاطئ أثناء السحب
+   - تطهير أمني (XSS Sanitizer) + تفعيل الروابط والمصادر والهاشتاجات تلقائياً
+   - الفيديوهات القصيرة العمودية (BBC Shorts 9:16) والفيديوهات العريضة (16:9)
+   - مشاركة الخبر مع الصورة الفعلية والملخص والرابط الديناميكي + إحصائيات الإعلانات
    ========================================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -189,7 +192,7 @@ const state = {
   currentAuthorKey: null
 };
 
-// ==================== 4. الدوال المساعدة، الفيديو، والروابط الآمنة ====================
+// ==================== 4. الدوال المساعدة، الفيديو، والصور المدمجة الآمنة ====================
 function escapeHtml(str = "") {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -257,7 +260,6 @@ function formatRelativeTime(timestamp) {
   return formatArabicDate(ms);
 }
 
-// استخراج معرف فيديو يوتيوب (يدعم الروابط العادية وروابط Shorts والروابط المختصرة)
 function extractYoutubeVideoId(url = "") {
   const clean = String(url || "").trim();
   if (!clean) return "";
@@ -286,7 +288,6 @@ function getPostEffectiveImageUrl(post) {
   if (post && post.imageUrl && String(post.imageUrl).trim() !== "") {
     return String(post.imageUrl).trim();
   }
-  // إذا كان المنشور يحتوي على فيديو يوتيوب بدون صورة مرفقة، نسحب صورة غلاف الفيديو تلقائياً
   const ytId = extractYoutubeVideoId(post?.videoUrl);
   if (ytId) {
     return `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
@@ -313,7 +314,7 @@ function buildPostThumbnailHtml(post, altText = "") {
   if (imgUrl) {
     return `<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(
       altText || post?.title || siteName
-    )}" loading="lazy">`;
+    )}" loading="lazy" decoding="async">`;
   }
 
   return `
@@ -327,19 +328,43 @@ function buildPostThumbnailHtml(post, altText = "") {
   `;
 }
 
-// معالجة آمنة 100% لنص المقال: تطهير XSS + دعم الروابط والمصادر التلقائي + تلوين الهاشتاجات دون كسر الروابط
+// ==================== محرك تطهير وتنسيق المقال ودعم الصور المدمجة بين الفقرات ====================
+function isSafeImageSrc(src = "") {
+  const clean = String(src || "").trim();
+  if (!clean) return false;
+  return (
+    /^https?:\/\//i.test(clean) ||
+    /^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/i.test(clean) ||
+    clean.startsWith("/")
+  );
+}
+
 function sanitizeAndFormatArticleHtml(rawHtml = "") {
   if (!rawHtml) return "";
 
-  const container = document.createElement("div");
-  container.innerHTML = rawHtml;
+  // دعم الاختصار السريع لإدراج صورة بين الفقرات إن كُتب نصياً: [صورة: رابط | وصف]
+  let preprocessedHtml = String(rawHtml).replace(
+    /\[صورة:\s*([^\]|\s]+)(?:\s*\|\s*([^\]]+))?\]/g,
+    (_, imgUrl, caption) => {
+      if (!isSafeImageSrc(imgUrl)) return "";
+      const capHtml = caption
+        ? `<figcaption>${escapeHtml(caption.trim())}</figcaption>`
+        : "";
+      return `<figure class="inline-article-figure"><img src="${escapeHtml(
+        imgUrl.trim()
+      )}" alt="${escapeHtml((caption || "صورة توضيحية").trim())}" loading="lazy">${capHtml}</figure>`;
+    }
+  );
 
-  // 1. إزالة أي عناصر خطرة أمنياً (XSS Protection)
+  const container = document.createElement("div");
+  container.innerHTML = preprocessedHtml;
+
+  // 1. إزالة العناصر الخطرة أمنياً (XSS Protection) مع الحفاظ الكامل على الصور والأطر الصحفية (img, figure, figcaption)
   container
-    .querySelectorAll("script, style, object, embed, form, input, button, meta, link")
+    .querySelectorAll("script, style, object, embed, form, input, button, meta, link, iframe")
     .forEach((el) => el.remove());
 
-  // 2. تأمين جميع العناصر والروابط الموجودة في النص
+  // 2. تأمين جميع العناصر والروابط والصور المدمجة داخل النص
   container.querySelectorAll("*").forEach((el) => {
     Array.from(el.attributes).forEach((attr) => {
       const name = attr.name.toLowerCase();
@@ -351,21 +376,45 @@ function sanitizeAndFormatArticleHtml(rawHtml = "") {
 
     if (el.tagName === "A") {
       const rawHref = (el.getAttribute("href") || "").trim();
-      if (rawHref && !/^https?:\/\//i.test(rawHref) && !rawHref.startsWith("/") && !rawHref.startsWith("#")) {
+      if (
+        rawHref &&
+        !/^https?:\/\//i.test(rawHref) &&
+        !rawHref.startsWith("/") &&
+        !rawHref.startsWith("#")
+      ) {
         el.setAttribute("href", `https://${rawHref}`);
       }
       el.setAttribute("target", "_blank");
       el.setAttribute("rel", "noopener noreferrer");
     }
+
+    if (el.tagName === "IMG") {
+      const src = (el.getAttribute("src") || "").trim();
+      if (!isSafeImageSrc(src)) {
+        el.remove();
+        return;
+      }
+      el.setAttribute("loading", "lazy");
+      el.setAttribute("decoding", "async");
+      if (!el.getAttribute("alt")) {
+        el.setAttribute("alt", "صورة مرفقة في التقرير");
+      }
+      if (el.parentElement?.tagName === "FIGURE") {
+        el.parentElement.classList.add("inline-article-figure");
+      }
+    }
   });
 
-  // 3. المرور على العقد النصية فقط (Text Nodes) لتحويل الروابط النصية والهاشتاجات بأمان تام دون المساس بوسوم HTML
+  // 3. معالجة العقد النصية لتحويل الروابط المكتوبة والهاشتاجات دون كسر وسوم HTML أو الصور
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
   const textNodes = [];
   let currentNode;
   while ((currentNode = walker.nextNode())) {
     const parentTag = currentNode.parentElement?.tagName;
-    if (parentTag && !["A", "SCRIPT", "STYLE", "CODE", "PRE"].includes(parentTag)) {
+    if (
+      parentTag &&
+      !["A", "SCRIPT", "STYLE", "CODE", "PRE", "FIGCAPTION"].includes(parentTag)
+    ) {
       textNodes.push(currentNode);
     }
   }
@@ -388,7 +437,6 @@ function sanitizeAndFormatArticleHtml(rawHtml = "") {
       }
 
       if (match[1]) {
-        // رابط مصدر مباشر مكتوب داخل النص
         const cleanUrl = match[1].replace(/[.,؛،!?)"]+$/, "");
         const trailingPunct = match[1].slice(cleanUrl.length);
 
@@ -403,7 +451,6 @@ function sanitizeAndFormatArticleHtml(rawHtml = "") {
           fragment.appendChild(document.createTextNode(trailingPunct));
         }
       } else if (match[3]) {
-        // هاشتاج نصي
         const leadingSpace = match[2] || "";
         const tagText = match[3];
         if (leadingSpace) {
@@ -427,6 +474,46 @@ function sanitizeAndFormatArticleHtml(rawHtml = "") {
   });
 
   return container.innerHTML;
+}
+
+// ==================== عارض الصور المكبر (Lightbox) للصور داخل المقال ====================
+function openImageLightbox(src, caption = "") {
+  if (!src) return;
+  const modal = document.getElementById("inline-image-lightbox");
+  const fullImg = document.getElementById("lightbox-full-img");
+  const capEl = document.getElementById("lightbox-caption-text");
+  if (!modal || !fullImg) return;
+
+  fullImg.src = src;
+  fullImg.alt = caption || "صورة مكبرة";
+
+  if (capEl) {
+    const cleanCap = String(caption || "").trim();
+    capEl.textContent = cleanCap;
+    capEl.classList.toggle("hidden", !cleanCap || cleanCap === "صورة مرفقة في التقرير");
+  }
+
+  modal.classList.remove("hidden");
+}
+
+function closeImageLightbox() {
+  const modal = document.getElementById("inline-image-lightbox");
+  const fullImg = document.getElementById("lightbox-full-img");
+  if (modal) modal.classList.add("hidden");
+  if (fullImg) fullImg.src = "";
+}
+
+function bindArticleImagesZoom(containerEl) {
+  if (!containerEl) return;
+  containerEl.querySelectorAll("img").forEach((img) => {
+    if (img.closest(".brand-fallback-thumb")) return;
+    img.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const figCap = img.closest("figure")?.querySelector("figcaption")?.textContent || "";
+      const caption = figCap || img.getAttribute("alt") || "";
+      openImageLightbox(img.src, caption);
+    });
+  });
 }
 
 function resolvePostAuthorInfo(post) {
@@ -502,7 +589,7 @@ function buildHorizontalCategoriesHtml(post) {
     ...subcats.map((s) => `<span class="card-subcat-pill">${escapeHtml(s)}</span>`)
   ].filter(Boolean);
 
-  return `<div class="horizontal-tags-scroll" title="اسحب أفقياً لتصفح التصنيفات">${pills.join("")}</div>`;
+  return `<div class="horizontal-tags-scroll" data-scroll-strip="true" title="اسحب أفقياً لتصفح التصنيفات">${pills.join("")}</div>`;
 }
 
 function postMatchesCompass(post, targetCompass) {
@@ -688,7 +775,6 @@ function applyDynamicSiteIdentity() {
   const footDomain = document.getElementById("footer-domain-label");
   if (footDomain) footDomain.textContent = currentHost;
 
-  // الشعار الشفاف وإخفاء/إظهار الاسم النصي
   const logoImg = document.getElementById("site-logo-img");
   const sidebarLogo = document.getElementById("sidebar-logo-img");
   const footerLogo = document.getElementById("footer-logo-img");
@@ -937,7 +1023,6 @@ function renderMasterSidebarContents() {
   }
 
   if (writersBlock && writersList) {
-    // ملاحظة: حتى لو سُحبت صلاحية الدخول من كاتب، يبقى اسمه وشارته وأرشيفه متاحاً للقراء
     const writers = state.staff.filter((s) => s.name && !s.hiddenFromPublic);
     if (writers.length) {
       writersBlock.classList.remove("hidden");
@@ -1028,7 +1113,6 @@ function renderBreakingNewsBar() {
   });
 }
 
-// تسجيل ظهور الإعلان مرة واحدة في الجلسة لضمان دقة إحصائيات الإعلانات في غرفة العمليات
 function recordAdImpressionOnce(adId) {
   if (!adId) return;
   try {
@@ -1045,7 +1129,6 @@ function renderPublicAds() {
   const topSlot = document.getElementById("ad-slot-top");
   const midSlot = document.getElementById("ad-slot-middle");
 
-  // احترام حالة الإعلان (نشط أم مجمد/متوقف من لوحة التحكم)
   const activeAds = state.ads.filter(
     (a) => a.active !== false && a.status !== "paused" && a.status !== "frozen"
   );
@@ -1155,7 +1238,6 @@ function renderHeroAndPulseSection() {
     bindCardInteractiveEvents(heroBox);
   }
 
-  // شريط موجز الأخبار السريعة
   const pulsePosts = published
     .filter((p) => p.isQuickNews || isBreakingStillActive(p))
     .slice(0, 10);
@@ -1184,7 +1266,6 @@ function renderHeroAndPulseSection() {
   }
 }
 
-// شريط الفيديوهات القصيرة والمرئيات (BBC Shorts / Reels 9:16)
 function renderShortsReelsSection() {
   const section = document.getElementById("shorts-reels-section");
   const listEl = document.getElementById("shorts-horizontal-list");
@@ -1258,8 +1339,39 @@ function buildNewsCardHtml(post) {
   `;
 }
 
+// ربط أحداث البطاقات مع حماية التمرير الأفقي للتصنيفات في الجوال حتى لا يفتح المقال بالخطأ أثناء السحب
 function bindCardInteractiveEvents(container) {
   if (!container) return;
+
+  container.querySelectorAll("[data-scroll-strip]").forEach((strip) => {
+    let startX = 0;
+    let isDragging = false;
+    strip.addEventListener(
+      "touchstart",
+      (e) => {
+        startX = e.touches[0]?.clientX || 0;
+        isDragging = false;
+      },
+      { passive: true }
+    );
+    strip.addEventListener(
+      "touchmove",
+      (e) => {
+        const currentX = e.touches[0]?.clientX || 0;
+        if (Math.abs(currentX - startX) > 8) {
+          isDragging = true;
+        }
+      },
+      { passive: true }
+    );
+    strip.addEventListener("click", (e) => {
+      if (isDragging) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    });
+  });
+
   container.querySelectorAll("[data-open-post]").forEach((card) => {
     card.addEventListener("click", (e) => {
       const catEl = e.target.closest("[data-card-cat]");
@@ -1533,7 +1645,7 @@ async function shareArticleUnified(post, triggerBtn = null) {
   }
 }
 
-// ==================== 11. قارئ الخبر الكامل، مشغل الفيديو العمودي/العريض، والروابط الآمنة ====================
+// ==================== 11. قارئ الخبر الكامل، الصور المدمجة، ومشغل الفيديو الذكي ====================
 function buildSmartVideoPlayerHtml(post) {
   const rawUrl = String(post?.videoUrl || "").trim();
   if (!rawUrl) return "";
@@ -1553,7 +1665,6 @@ function buildSmartVideoPlayerHtml(post) {
     `;
   }
 
-  // دعم ملفات الفيديو المباشرة (.mp4 / .webm)
   if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(rawUrl)) {
     return `
       <div class="${frameClass}">
@@ -1623,7 +1734,6 @@ function openArticleReader(postId, updateHistory = true) {
     } catch (_) {}
   }
 
-  // شريط تصنيفات المقال
   const badgesEl = document.getElementById("article-categories-badges");
   if (badgesEl) {
     const subcats = [];
@@ -1705,19 +1815,21 @@ function openArticleReader(postId, updateHistory = true) {
   }
 
   if (mediaFig) {
-    // إذا كان هناك فيديو مضمن ولا توجد صورة خاصة منفصلة، نخفي الصورة المكررة ليظهر الفيديو بأناقة
     if (videoPlayerHtml && !post.imageUrl) {
       mediaFig.classList.add("hidden");
     } else {
       mediaFig.classList.remove("hidden");
       mediaFig.innerHTML = buildPostThumbnailHtml(post, post.title);
+      bindArticleImagesZoom(mediaFig);
     }
   }
 
-  // نص المقال الكامل بعد تطهيره ودعم الروابط والمصادر والهاشتاجات بأمان
+  // نص المقال الكامل مع تفعيل الصور المتعددة المدمجة بين الفقرات وعارض التكبير (Lightbox)
   const contentEl = document.getElementById("reader-article-content");
   if (contentEl) {
     contentEl.innerHTML = sanitizeAndFormatArticleHtml(post.content || "");
+    bindArticleImagesZoom(contentEl);
+
     contentEl.querySelectorAll("[data-inline-tag]").forEach((tagSpan) => {
       tagSpan.addEventListener("click", () => {
         filterByHashtag(tagSpan.getAttribute("data-inline-tag"));
@@ -1752,7 +1864,6 @@ function openArticleReader(postId, updateHistory = true) {
     }
   }
 
-  // أخبار وتقارير ذات صلة
   const relatedGrid = document.getElementById("related-posts-grid");
   if (relatedGrid) {
     const related = getPublishedPosts()
@@ -1892,7 +2003,7 @@ function openStaticPage(pageKey) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ==================== 13. ربط الأحداث، البحث، والمزامنة الحية الآمنة ====================
+// ==================== 13. ربط الأحداث، البحث، وعارض الصور المكبر ====================
 function resetToHomeFeed() {
   closeMasterSidebar();
   state.activeCompass = "all";
@@ -1998,6 +2109,26 @@ function bindPublicEvents() {
     renderPublicPostsFeed();
   });
 
+  // أحداث إغلاق عارض الصور المكبر (Lightbox)
+  document
+    .getElementById("close-lightbox-btn")
+    ?.addEventListener("click", closeImageLightbox);
+
+  document
+    .getElementById("inline-image-lightbox")
+    ?.addEventListener("click", (e) => {
+      if (e.target.id === "inline-image-lightbox") {
+        closeImageLightbox();
+      }
+    });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeImageLightbox();
+      closeMasterSidebar();
+    }
+  });
+
   const searchForm = document.getElementById("public-search-form");
   const searchInput = document.getElementById("public-search-input");
   const clearBtn = document.getElementById("clear-search-btn");
@@ -2053,7 +2184,6 @@ function startPublicRealtimeSync() {
   onSnapshot(doc(db, "settings", "general"), (snap) => {
     if (snap.exists()) {
       const rawSettings = snap.data() || {};
-      // عدم الاحتفاظ بمفاتيح خارجية خاصة في ذاكرة الموقع العام
       const { imgbbApiKey, ...publicSafeSettings } = rawSettings;
       state.settings = { ...state.settings, ...publicSafeSettings };
     }
@@ -2080,7 +2210,6 @@ function startPublicRealtimeSync() {
     renderAllHomeSections();
   });
 
-  // تنقية بيانات الكادر في الواجهة العامة لحماية الخصوصية والأمان
   onSnapshot(collection(db, "staff"), (snap) => {
     state.staff = snap.docs.map((d) => {
       const raw = d.data() || {};
