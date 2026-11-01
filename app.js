@@ -1,10 +1,11 @@
 /* ==========================================================================
-   حُجرية بريس (Hujariya Press) — المحرك البرمجي الكلاسيكي النظيف (الموقع العام)
-   النسخة المحصّنة:
-   - عرض أول تصنيفين فقط (2 Categories Max) على بطاقات الأخبار في الصفحة الرئيسية والأقسام
-   - عرض كافة التصنيفات داخل صفحة قراءة المقال فقط
+   حُجرية بريس (Hujariya Press) — المحرك البرمجي للموقع العام (طابع الجزيرة الحديث)
+   الهوية القرمزية الفخمة (#b80d38) + المساحات البيضاء النقية:
+   - شبكة التغطية الرئيسية غير المتماثلة (Asymmetric Hero Grid: خبر رئيسي + 3 أخبار جانبية)
+   - محرك البحث الذكي العائم في الأسفل (فلترة لحظية مع كل حرف + عداد نتائج فوري)
+   - شارات الفيديو السينمائية المدمجة فوق الصور + الفيديوهات القصيرة (9:16) والعريضة (16:9)
+   - الاكتفاء بأول تصنيفين في البطاقات لمنع تشوه الجوال + عرض كل التصنيفات داخل المقال
    - دعم الصور المتعددة المدمجة بين فقرات المقال (Inline Images & Figures) + عارض Lightbox
-   - الفيديوهات القصيرة العمودية (BBC Shorts 9:16) والفيديوهات العريضة (16:9)
    ========================================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -35,7 +36,8 @@ const db = getFirestore(app);
 const VIEWED_POSTS_STORAGE_KEY = "hujariya_unique_views_v3";
 const VIEWED_ADS_SESSION_KEY = "hujariya_ad_impressions_v1";
 const MAX_ALLOWED_TAGS = 3;
-const MAX_CARD_CATEGORIES = 2; // الحد الأقصى للتصنيفات الظاهرة على بطاقات الصفحة الرئيسية
+const MAX_CARD_CATEGORIES = 2; // عرض أول تصنيفين فقط في بطاقات الصفحة الرئيسية لمنع تشوه الجوال
+const DEFAULT_CRIMSON_COLOR = "#b80d38";
 
 function getDynamicSiteBaseUrl() {
   try {
@@ -171,7 +173,7 @@ const state = {
     appIconUrl: "",
     coverImageUrl: "",
     defaultPostImageUrl: "",
-    accentColor: "#ef3327",
+    accentColor: DEFAULT_CRIMSON_COLOR,
     aboutHtml: DEFAULT_ABOUT_HTML,
     charterHtml: DEFAULT_CHARTER_HTML,
     privacyHtml: DEFAULT_PRIVACY_HTML,
@@ -301,7 +303,8 @@ function getPostEffectiveImageUrl(post) {
   return "";
 }
 
-function buildPostThumbnailHtml(post, altText = "") {
+// توليد الصورة المصغرة مع شارة الفيديو السينمائية المدمجة فوق زاوية الصورة بأسلوب الجزيرة
+function buildPostThumbnailHtml(post, altText = "", showFloatingMediaBadge = true) {
   const imgUrl = getPostEffectiveImageUrl(post);
   const s = state.settings;
   const fallbackLogo = (s.logoUrl || s.faviconUrl || s.appIconUrl || "").trim();
@@ -310,10 +313,24 @@ function buildPostThumbnailHtml(post, altText = "") {
       ? s.siteName
       : "حُجرية بريس";
 
+  const hasVideo = showFloatingMediaBadge && isPostVideo(post);
+  const isShort = isPostShortVerticalVideo(post);
+  const floatingBadgeHtml = hasVideo
+    ? `<span class="media-floating-badge">
+        <span class="material-symbols-rounded" translate="no">play_circle</span>
+        <span>${isShort ? "فيديو قصير" : "فيديو"}${
+        post?.videoDuration ? ` • ${escapeHtml(post.videoDuration)}` : ""
+      }</span>
+      </span>`
+    : "";
+
   if (imgUrl) {
-    return `<img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(
+    return `
+      <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(
       altText || post?.title || siteName
-    )}" loading="lazy" decoding="async">`;
+    )}" loading="lazy" decoding="async">
+      ${floatingBadgeHtml}
+    `;
   }
 
   return `
@@ -324,6 +341,7 @@ function buildPostThumbnailHtml(post, altText = "") {
           : `<strong class="brand-fallback-name">${escapeHtml(siteName)}</strong>`
       }
     </div>
+    ${floatingBadgeHtml}
   `;
 }
 
@@ -533,7 +551,7 @@ function resolvePostAuthorInfo(post) {
   const avatar =
     matchedStaff?.avatar ||
     post?.authorAvatar ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ef3327&color=fff`;
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=b80d38&color=fff`;
   const verified = matchedStaff
     ? Boolean(matchedStaff.verified || matchedStaff.role === "admin" || matchedStaff.isMasterAdmin)
     : Boolean(post?.authorVerified);
@@ -568,7 +586,6 @@ function buildCardCategoriesHtml(post, maxLimit = MAX_CARD_CATEGORIES) {
     subcats.push(post.subcategory);
   }
 
-  // جمع كافة التصنيفات ثم الاكتفاء بأول تصنيفين فقط (maxLimit = 2) لمنع التشوه والانكماش في الجوال
   const allBadgeObjects = [
     ...cats.map((c) => ({
       type: "cat",
@@ -584,12 +601,6 @@ function buildCardCategoriesHtml(post, maxLimit = MAX_CARD_CATEGORIES) {
 
   const visibleSlice = allBadgeObjects.slice(0, maxLimit);
   const hiddenCount = Math.max(0, allBadgeObjects.length - visibleSlice.length);
-
-  const videoBadge = isPostVideo(post)
-    ? `<span class="card-video-pill">${
-        isPostShortVerticalVideo(post) ? "📱 فيديو قصير" : "▶ فيديو"
-      }${post.videoDuration ? ` (${escapeHtml(post.videoDuration)})` : ""}</span>`
-    : "";
 
   const pillsHtml = visibleSlice
     .map((item) => {
@@ -607,7 +618,7 @@ function buildCardCategoriesHtml(post, maxLimit = MAX_CARD_CATEGORIES) {
       ? `<span class="card-more-cats-pill" title="يوجد ${hiddenCount} تصنيفات إضافية داخل الخبر">+${hiddenCount}</span>`
       : "";
 
-  return `<div class="card-categories-row">${videoBadge}${pillsHtml}${moreBadgeHtml}</div>`;
+  return `<div class="card-categories-row">${pillsHtml}${moreBadgeHtml}</div>`;
 }
 
 function postMatchesCompass(post, targetCompass) {
@@ -755,7 +766,16 @@ async function initGlobalMarketsStrip() {
   track.innerHTML = `${singlePass}<span class="t-sep">|</span>${singlePass}`;
 }
 
-// ==================== 7. تطبيق الهوية البصرية والشعار المفرغ الشفاف ====================
+// ==================== 7. تطبيق الهوية القرمزية الفخمة والحاضنة الذكية للشعار المفرغ ====================
+function resolveEffectiveCrimsonColor(savedColor = "") {
+  const clean = String(savedColor || "").trim().toLowerCase();
+  // إذا كان اللون المخزن سابقاً هو الأحمر البرتقالي القديم (#ef3327)، نعتمد القرمزي الفخم الجديد تلقائياً
+  if (!clean || clean === "#ef3327") {
+    return DEFAULT_CRIMSON_COLOR;
+  }
+  return savedColor;
+}
+
 function applyDynamicSiteIdentity() {
   const s = state.settings;
   const siteName =
@@ -765,7 +785,7 @@ function applyDynamicSiteIdentity() {
   const siteDesc =
     s.siteDescription ||
     "حُجرية بريس — منصة إخبارية وتحليلية شاملة تندرج تحت مظلة مؤسسة RAWI-YE.COM الإعلامية الرقمية.";
-  const brandColor = s.accentColor || "#ef3327";
+  const brandColor = resolveEffectiveCrimsonColor(s.accentColor);
 
   document.documentElement.style.setProperty("--brand-red", brandColor);
 
@@ -793,8 +813,11 @@ function applyDynamicSiteIdentity() {
   const footDomain = document.getElementById("footer-domain-label");
   if (footDomain) footDomain.textContent = currentHost;
 
+  // إدارة الشعار المفرغ داخل الكبسولة القرمزية لضمان وضوحه التام فوق الهيدر الأبيض
   const logoImg = document.getElementById("site-logo-img");
+  const headerCapsule = document.getElementById("header-logo-capsule");
   const sidebarLogo = document.getElementById("sidebar-logo-img");
+  const sidebarCapsule = document.getElementById("sidebar-logo-capsule");
   const footerLogo = document.getElementById("footer-logo-img");
   const hasLogo = Boolean(s.logoUrl && s.logoUrl.trim() !== "");
 
@@ -807,6 +830,9 @@ function applyDynamicSiteIdentity() {
       imgEl.classList.add("hidden");
     }
   });
+
+  headerCapsule?.classList.toggle("hidden", !hasLogo);
+  sidebarCapsule?.classList.toggle("hidden", !hasLogo);
 
   if (textBrand) {
     const shouldHideText = hasLogo && Boolean(s.hideSiteName);
@@ -859,8 +885,8 @@ function updateDynamicWebAppManifest(name, description, iconUrl, themeColor) {
       description,
       start_url: getDynamicSiteBaseUrl(),
       display: "standalone",
-      background_color: "#f6f5f2",
-      theme_color: themeColor || "#ef3327",
+      background_color: "#ffffff",
+      theme_color: themeColor || DEFAULT_CRIMSON_COLOR,
       dir: "rtl",
       lang: "ar",
       icons: [
@@ -1050,7 +1076,7 @@ function renderMasterSidebarContents() {
             w.avatar ||
             `https://ui-avatars.com/api/?name=${encodeURIComponent(
               w.name
-            )}&background=ef3327&color=fff`;
+            )}&background=b80d38&color=fff`;
           return `
             <button type="button" class="sidebar-writer-btn" data-side-writer="${escapeHtml(w.id)}">
               <img src="${escapeHtml(av)}" alt="">
@@ -1092,7 +1118,7 @@ function selectCompassCategory(compassName) {
   renderAllHomeSections();
 }
 
-// ==================== 9. العاجل، الإعلانات الذكية، الخبر الرئيسي، النبض، والفيديوهات القصيرة ====================
+// ==================== 9. العاجل، الإعلانات، وشبكة الجزيرة غير المتماثلة (Asymmetric Hero Grid) ====================
 function getPublishedPosts() {
   return state.posts.filter((p) => !p.status || p.status === "published");
 }
@@ -1193,6 +1219,7 @@ function renderPublicAds() {
   });
 }
 
+// شبكة العرض غير المتماثلة بأسلوب الجزيرة (خبر رئيسي ضخم يميناً + عمود أبرز 3 أخبار يساراً)
 function renderHeroAndPulseSection() {
   const heroSection = document.getElementById("hero-featured-section");
   const heroBox = document.getElementById("hero-featured-box");
@@ -1225,37 +1252,72 @@ function renderHeroAndPulseSection() {
   } else {
     const authorInfo = resolvePostAuthorInfo(heroPost);
     const summaryText =
-      heroPost.summary || stripHtmlToPlain(heroPost.content).slice(0, 175) + "...";
+      heroPost.summary || stripHtmlToPlain(heroPost.content).slice(0, 180) + "...";
+
+    // اختيار أبرز 3 أخبار تالية للعمود الأيسر المرافق في شبكة الجزيرة
+    const sideHeadlinePosts = scoped.filter((p) => p.id !== heroPost.id).slice(0, 3);
+    const hasSideStack = sideHeadlinePosts.length > 0;
+
+    const sideStackHtml = hasSideStack
+      ? `
+        <div class="aj-hero-side-stack">
+          ${sideHeadlinePosts
+            .map((sp) => {
+              const spAuthor = resolvePostAuthorInfo(sp);
+              return `
+                <article class="aj-hero-side-item" data-open-post="${escapeHtml(sp.id)}">
+                  <div class="aj-side-thumb">
+                    ${buildPostThumbnailHtml(sp, sp.title, false)}
+                  </div>
+                  <div class="aj-side-info">
+                    ${buildCardCategoriesHtml(sp, 1)}
+                    <h3 class="aj-side-title">${escapeHtml(sp.title)}</h3>
+                    <div style="font-size:0.71rem;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;">
+                      <span>${escapeHtml(spAuthor.name)}</span>
+                      <span>${formatRelativeTime(sp.createdAt)}</span>
+                    </div>
+                  </div>
+                </article>
+              `;
+            })
+            .join("")}
+        </div>
+      `
+      : "";
 
     heroBox.innerHTML = `
-      <article class="lead-story-card" data-open-post="${escapeHtml(heroPost.id)}">
-        <div class="lead-story-media">
-          ${buildPostThumbnailHtml(heroPost, heroPost.title)}
-        </div>
-        <div class="lead-story-body">
-          <div>
-            ${buildCardCategoriesHtml(heroPost, MAX_CARD_CATEGORIES)}
-            <h2 class="lead-story-title">${escapeHtml(heroPost.title)}</h2>
-            <p class="lead-story-summary">${escapeHtml(summaryText)}</p>
+      <div class="aj-asymmetric-hero-grid ${hasSideStack ? "" : "aj-hero-Single-only"}">
+        <article class="lead-story-card" data-open-post="${escapeHtml(heroPost.id)}">
+          <div class="lead-story-media">
+            ${buildPostThumbnailHtml(heroPost, heroPost.title, true)}
           </div>
-          <div class="card-clean-meta">
-            <span class="card-author-name" data-open-author="${escapeHtml(authorInfo.authorKey)}">
-              <span>${escapeHtml(authorInfo.name)}</span>
-              ${
-                authorInfo.verified
-                  ? `<span class="material-symbols-rounded verified-icon" translate="no">verified</span>`
-                  : ""
-              }
-            </span>
-            <span>${formatRelativeTime(heroPost.createdAt)}</span>
+          <div class="lead-story-body">
+            <div>
+              ${buildCardCategoriesHtml(heroPost, MAX_CARD_CATEGORIES)}
+              <h2 class="lead-story-title">${escapeHtml(heroPost.title)}</h2>
+              <p class="lead-story-summary">${escapeHtml(summaryText)}</p>
+            </div>
+            <div class="card-clean-meta">
+              <span class="card-author-name" data-open-author="${escapeHtml(authorInfo.authorKey)}">
+                <span>${escapeHtml(authorInfo.name)}</span>
+                ${
+                  authorInfo.verified
+                    ? `<span class="material-symbols-rounded verified-icon" translate="no">verified</span>`
+                    : ""
+                }
+              </span>
+              <span>${formatRelativeTime(heroPost.createdAt)}</span>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
+        ${sideStackHtml}
+      </div>
     `;
 
     bindCardInteractiveEvents(heroBox);
   }
 
+  // شريط موجز الأخبار السريعة (النبض)
   const pulsePosts = published
     .filter((p) => p.isQuickNews || isBreakingStillActive(p))
     .slice(0, 10);
@@ -1311,7 +1373,7 @@ function renderShortsReelsSection() {
       const dur = p.videoDuration ? ` • ${escapeHtml(p.videoDuration)}` : "";
       return `
         <article class="short-reel-card" data-open-post="${escapeHtml(p.id)}">
-          ${buildPostThumbnailHtml(p, p.title)}
+          ${buildPostThumbnailHtml(p, p.title, false)}
           <span class="short-play-badge">${badgeLabel}${dur}</span>
           <div class="short-reel-overlay">
             <h3 class="short-reel-title">${escapeHtml(p.title)}</h3>
@@ -1328,12 +1390,12 @@ function renderShortsReelsSection() {
 
 function buildNewsCardHtml(post) {
   const authorInfo = resolvePostAuthorInfo(post);
-  const excerpt = post.summary || stripHtmlToPlain(post.content).slice(0, 120) + "...";
+  const excerpt = post.summary || stripHtmlToPlain(post.content).slice(0, 125) + "...";
 
   return `
     <article class="bbc-news-card" data-open-post="${escapeHtml(post.id)}">
       <div class="bbc-card-thumb">
-        ${buildPostThumbnailHtml(post, post.title)}
+        ${buildPostThumbnailHtml(post, post.title, true)}
       </div>
       <div class="bbc-card-content">
         <div>
@@ -1386,6 +1448,7 @@ function renderPublicPostsFeed() {
   const filterBanner = document.getElementById("active-filter-banner");
   const filterTitle = document.getElementById("active-filter-title");
   const loadMoreWrap = document.getElementById("load-more-wrap");
+  const floatingSearchCount = document.getElementById("floating-search-count");
 
   if (!grid) return;
 
@@ -1412,16 +1475,27 @@ function renderPublicPostsFeed() {
     const q = state.searchQuery.toLowerCase();
     list = list.filter((p) => {
       const hay = `${p.title || ""} ${p.summary || ""} ${p.author || ""} ${(
-        p.tags || []
-      ).join(" ")}`.toLowerCase();
+        p.categories || []
+      ).join(" ")} ${(p.tags || []).join(" ")}`.toLowerCase();
       return hay.includes(q);
     });
+  }
+
+  // تحديث عداد شريط البحث العائم الذكي في الأسفل
+  if (floatingSearchCount) {
+    if (state.searchQuery) {
+      floatingSearchCount.textContent = `${list.length.toLocaleString("ar-YE")} نتيجة`;
+      floatingSearchCount.classList.remove("hidden");
+    } else {
+      floatingSearchCount.classList.add("hidden");
+    }
   }
 
   if (state.searchQuery || state.activeTag || state.activeCompass !== "all") {
     filterBanner?.classList.remove("hidden");
     if (filterTitle) {
-      if (state.searchQuery) filterTitle.textContent = `نتائج البحث: "${state.searchQuery}"`;
+      if (state.searchQuery)
+        filterTitle.textContent = `نتائج البحث الفوري عن: "${state.searchQuery}"`;
       else if (state.activeTag) filterTitle.textContent = `الوسم: #${state.activeTag}`;
       else if (state.activeCompass === "pulse-only")
         filterTitle.textContent = "صفحة الأخبار السريعة والعاجلة (النبض)";
@@ -1438,7 +1512,9 @@ function renderPublicPostsFeed() {
   }
 
   if (heading) {
-    if (state.activeCompass === "pulse-only") {
+    if (state.searchQuery) {
+      heading.textContent = "المواد المطابقة لبحثك";
+    } else if (state.activeCompass === "pulse-only") {
       heading.textContent = "جميع الأخبار السريعة والعاجلة";
     } else if (state.activeCompass === "shorts-only") {
       heading.textContent = "الفيديوهات القصيرة والمرئيات";
@@ -1454,7 +1530,7 @@ function renderPublicPostsFeed() {
   }
 
   if (!list.length) {
-    grid.innerHTML = `<div class="skeleton-box" style="grid-column:1/-1;height:140px;">لا توجد أخبار تطابق خيارات العرض الحالية.</div>`;
+    grid.innerHTML = `<div class="skeleton-box" style="grid-column:1/-1;height:140px;">لا توجد أخبار تطابق خيارات العرض أو البحث الحالي.</div>`;
     loadMoreWrap?.classList.add("hidden");
     return;
   }
@@ -1487,7 +1563,7 @@ function renderWritersStrip() {
         w.avatar ||
         `https://ui-avatars.com/api/?name=${encodeURIComponent(
           w.name
-        )}&background=ef3327&color=fff`;
+        )}&background=b80d38&color=fff`;
       const isVer = Boolean(w.verified || w.role === "admin" || w.isMasterAdmin);
       return `
         <button type="button" class="writer-clean-card" data-open-author="${escapeHtml(w.id)}">
@@ -1581,7 +1657,7 @@ async function shareArticleUnified(post, triggerBtn = null) {
   const topLabel = document.getElementById("unified-share-label");
   const bottomLabel = document.getElementById("unified-share-bottom-label");
   const originalTopText = topLabel ? topLabel.textContent : "مشاركة";
-  const originalBottomText = bottomLabel ? bottomLabel.textContent : "مشاركة الخبر";
+  const originalBottomText = bottomLabel ? bottomLabel.textContent : "مشاركة التقرير";
 
   if (triggerBtn) triggerBtn.disabled = true;
   if (topLabel) topLabel.textContent = "جاري التجهيز...";
@@ -1722,7 +1798,6 @@ function openArticleReader(postId, updateHistory = true) {
     } catch (_) {}
   }
 
-  // داخل صفحة المقال فقط: عرض جميع التصنيفات والتفرعات الخاصة بالخبر
   const badgesEl = document.getElementById("article-categories-badges");
   if (badgesEl) {
     const subcats = [];
@@ -1807,7 +1882,7 @@ function openArticleReader(postId, updateHistory = true) {
       mediaFig.classList.add("hidden");
     } else {
       mediaFig.classList.remove("hidden");
-      mediaFig.innerHTML = buildPostThumbnailHtml(post, post.title);
+      mediaFig.innerHTML = buildPostThumbnailHtml(post, post.title, false);
       bindArticleImagesZoom(mediaFig);
     }
   }
@@ -1911,7 +1986,7 @@ function openAuthorProfile(authorKey, updateHistory = true) {
     authorPosts[0]?.authorAvatar ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(
       displayName
-    )}&background=ef3327&color=fff`;
+    )}&background=b80d38&color=fff`;
   const isVerified = staffMember
     ? Boolean(
         staffMember.verified ||
@@ -1989,7 +2064,7 @@ function openStaticPage(pageKey) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ==================== 13. ربط الأحداث، البحث، وعارض الصور المكبر ====================
+// ==================== 13. ربط الأحداث، البحث الذكي العائم، وعارض الصور المكبر ====================
 function resetToHomeFeed() {
   closeMasterSidebar();
   state.activeCompass = "all";
@@ -2001,6 +2076,7 @@ function resetToHomeFeed() {
   const searchInput = document.getElementById("public-search-input");
   if (searchInput) searchInput.value = "";
   document.getElementById("clear-search-btn")?.classList.add("hidden");
+  document.getElementById("floating-search-count")?.classList.add("hidden");
 
   try {
     window.history.pushState({}, "", window.location.pathname);
@@ -2057,10 +2133,17 @@ function bindPublicEvents() {
     .getElementById("view-all-pulse-btn")
     ?.addEventListener("click", openPulseDedicatedPage);
   document
+    .getElementById("header-pulse-shortcut")
+    ?.addEventListener("click", openPulseDedicatedPage);
+
+  document
     .getElementById("sidebar-shorts-page-btn")
     ?.addEventListener("click", openShortsDedicatedPage);
   document
     .getElementById("view-all-shorts-btn")
+    ?.addEventListener("click", openShortsDedicatedPage);
+  document
+    .getElementById("header-shorts-shortcut")
     ?.addEventListener("click", openShortsDedicatedPage);
 
   document.getElementById("brand-home-link")?.addEventListener("click", (e) => {
@@ -2114,29 +2197,34 @@ function bindPublicEvents() {
     }
   });
 
+  // محرك البحث الذكي العائم في الأسفل (فلترة لحظية مع كل حرف بدون زر تأكيد)
   const searchForm = document.getElementById("public-search-form");
   const searchInput = document.getElementById("public-search-input");
   const clearBtn = document.getElementById("clear-search-btn");
 
   searchForm?.addEventListener("submit", (e) => {
     e.preventDefault();
-    state.searchQuery = (searchInput?.value || "").trim();
-    switchPublicView("home");
-    renderAllHomeSections();
+    searchInput?.blur();
   });
 
   searchInput?.addEventListener("input", () => {
     const val = (searchInput.value || "").trim();
     state.searchQuery = val;
     clearBtn?.classList.toggle("hidden", !val);
-    if (state.activeView !== "home") switchPublicView("home");
+    if (state.activeView !== "home") {
+      switchPublicView("home");
+    }
     renderAllHomeSections();
   });
 
   clearBtn?.addEventListener("click", () => {
-    if (searchInput) searchInput.value = "";
+    if (searchInput) {
+      searchInput.value = "";
+      searchInput.focus();
+    }
     state.searchQuery = "";
     clearBtn.classList.add("hidden");
+    document.getElementById("floating-search-count")?.classList.add("hidden");
     renderAllHomeSections();
   });
 
